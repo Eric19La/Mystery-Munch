@@ -34,40 +34,48 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       // Body Section
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 25),
-            // Search Bar
-            SearchBarWidget(),
-            const SizedBox(height: 25),
+      body: Column(
+        children: [
+          const SizedBox(height: 20),
+          const SearchBarWidget(),
+          const SizedBox(height: 5),
 
-            // Category Scrollable Icons
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CategoryIcon(Icons.location_pin, "Location"),
-                  CategoryIcon(Icons.price_change, "Price"),
-                  CategoryIcon(Icons.restaurant_menu, "Cuisine"),
-                  CategoryIcon(Icons.fastfood, "Fast Food"),
-                  CategoryIcon(Icons.local_drink, "Drinks"),
-                  CategoryIcon(Icons.coffee, "Coffee"),
-                  CategoryIcon(Icons.soup_kitchen, "Soup"),
-                  CategoryIcon(Icons.filter_list_alt, "Filter"),
+                  const SizedBox(height: 20),
+
+                  // Category Scrollable Icons
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      children: [
+                        CategoryIcon(Icons.location_pin, "Location"),
+                        CategoryIcon(Icons.price_change, "Price"),
+                        CategoryIcon(Icons.restaurant_menu, "Cuisine"),
+                        CategoryIcon(Icons.fastfood, "Fast Food"),
+                        CategoryIcon(Icons.local_drink, "Drinks"),
+                        CategoryIcon(Icons.coffee, "Coffee"),
+                        CategoryIcon(Icons.soup_kitchen, "Soup"),
+                        CategoryIcon(Icons.filter_list_alt, "Filter"),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Category Sections
+                  CategorySection(title: "Fast Food", items: fastFood),
+                  CategorySection(title: "Asian Food", items: asianFood),
+                  CategorySection(title: "Food", items: fastFood),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-
-            // Category Sections
-            CategorySection(title: "Fast Food", items: fastFood),
-            CategorySection(title: "Asian Food", items: asianFood),
-            CategorySection(title: "Food", items: fastFood),
-          ],
-        ),
+          ),
+        ],
+        
       ),
 
       // Bottom Navigation Bar
