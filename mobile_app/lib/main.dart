@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mystery Munch',
       theme: ThemeData(
-        colorSchemeSeed: Colors.amber
+        colorSchemeSeed: Colors.amber[50],
         // colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       debugShowCheckedModeBanner: false,
