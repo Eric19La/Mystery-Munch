@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/controllers/nav_controller.dart';
+import 'package:mobile_app/widgets/bottom_navbar.dart';
 import '../widgets/category_icon.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/category_section.dart';
@@ -8,22 +10,10 @@ class HomeScreen extends StatefulWidget {
 
   // Create an instance
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0; // Tracks the current active tab
-
-  // Determine when the navigation label appears
-  NavigationDestinationLabelBehavior labelBehavior = NavigationDestinationLabelBehavior.alwaysShow;
-
-  // Updates _selectedIndex when a navigation item is pressed and rebuilds the UI
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,32 +65,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
-        
       ),
 
       // Bottom Navigation Bar
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          labelTextStyle: MaterialStateProperty.all(
-            TextStyle(fontSize: 14),
-          ),
-        ),
-        child: NavigationBar(
-          backgroundColor: Colors.amber[20],
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: _onItemTapped,
-          labelBehavior: labelBehavior,
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.search), label: "Search"),
-            NavigationDestination(icon: Icon(Icons.map), label: "Map"),
-            NavigationDestination(icon: Icon(Icons.settings), label: "Settings"),
-          ],
-        ),
+      bottomNavigationBar: BottomNavBar(
+        selectedIndex: 0, // Explore/Home Page has the index 0
+        onPageSelected: (index) => selectedPage(context, index),
       ),
 
     );
   }
-
 }
 
 // Sample fast food data
