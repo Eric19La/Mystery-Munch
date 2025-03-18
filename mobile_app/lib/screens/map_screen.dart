@@ -3,7 +3,7 @@ import 'package:mobile_app/controllers/nav_controller.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-
+import '../widgets/search_bar.dart';
 import '../widgets/category_section.dart';
 
 class MapScreen extends StatefulWidget {
@@ -22,6 +22,8 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(title: Text("Map")),
       body: Stack(
         children: [
+          const SearchBarWidget(),
+          const SizedBox(height: 5),
           // Maps
           FlutterMap(
             options: MapOptions(
@@ -110,34 +112,28 @@ class _MapScreenState extends State<MapScreen> {
                         ),
                         const SizedBox(height: 5),
                         const Text("🟢 Open • Closes at 1:30 AM", style: TextStyle(color: Colors.green)),
-                        const SizedBox(height: 15),
                       ],
                     ),
                   ),
 
-                  CategorySection(title: "In-N-Out", items: fastFood),
-
-                  // // Food Menu (Horizontal Scroll)
-                  // SizedBox(
-                  //   height: 150,
-                  //   child: ListView(
-                  //     scrollDirection: Axis.horizontal,
-                  //     padding: const EdgeInsets.only(left: 16),
-                  //     children: [
-                  //       CategorySection(title: "Fast Food", items: fastFood),
-                  //     ],
-                  //   ),
-                  // ),
-
+                  // Images of the Food/Restaurant
+                  CategorySection(title: "", items: fastFood),
                   const SizedBox(height: 15),
 
-                  // Delivery & Pickup Buttons
+                  // Randomize Feature
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildOptionButton("Randomize", "🚚", Colors.amber),
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+                          onPressed: () {
+                            // TODO Implement the randomize feature
+                          },
+                          icon: Text("🚗"),
+                          label: Text("Randomize"),
+                        ),
                       ],
                     ),
                   ),
@@ -151,34 +147,15 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  // Widget for a food item
-  Widget _buildFoodItem(String name, String price, String imageUrl) {
-    return Container(
-      width: 120,
-      margin: const EdgeInsets.only(right: 12),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.network(imageUrl, width: 120, height: 80, fit: BoxFit.cover),
-          ),
-          const SizedBox(height: 5),
-          Text(name, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text(price, style: const TextStyle(color: Colors.red)),
-        ],
-      ),
-    );
-  }
-
-  // Widget for Delivery/Pickup Buttons
-  Widget _buildOptionButton(String text, String emoji, Color color) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(backgroundColor: color),
-      onPressed: () {},
-      icon: Text(emoji),
-      label: Text(text),
-    );
-  }
+  // // Widget for Delivery/Pickup Buttons
+  // Widget _buildOptionButton(String text, String emoji, Color color) {
+  //   return ElevatedButton.icon(
+  //     style: ElevatedButton.styleFrom(backgroundColor: color),
+  //     onPressed: () {},
+  //     icon: Text(emoji),
+  //     label: Text(text),
+  //   );
+  // }
 
 } // end MapScreen
 
