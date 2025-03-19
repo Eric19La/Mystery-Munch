@@ -3,6 +3,7 @@ import 'package:mobile_app/controllers/nav_controller.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:mobile_app/widgets/bottom_sheet_list.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/category_section.dart';
 
@@ -41,7 +42,7 @@ class _MapScreenState extends State<MapScreen> {
                     width: 40,
                     height: 40,
                     child: GestureDetector(
-                      onTap: () => _showBottomSheet(context),
+                      onTap: () => _showBottomSheet(context, fastFood),
                       child: const Icon(Icons.location_pin, color: Colors.red, size: 40),
                     ),
                   ),
@@ -61,7 +62,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   // Bottom Sheet for Restaurant Info
-  void _showBottomSheet(BuildContext context) {
+  void _showBottomSheet(BuildContext context, List<Map<String, String>> fastFood) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -69,93 +70,13 @@ class _MapScreenState extends State<MapScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.4, // Default height
-          minChildSize: 0.3, // Minimum height
-          maxChildSize: 0.9, // Maximum height
-          expand: false,
-          builder: (context, scrollController) {
-            return SingleChildScrollView(
-              controller: scrollController,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Drag Handle
-                  Center(
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      width: 40,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[400],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-
-                  // Restaurant Info
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "In-N-Out",
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: const [
-                            Icon(Icons.star, color: Colors.yellow, size: 20),
-                            Text(" 4.4 (500+) • \$ • 900 ft"),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        const Text("🟢 Open • Closes at 1:30 AM", style: TextStyle(color: Colors.green)),
-                      ],
-                    ),
-                  ),
-
-                  // Images of the Food/Restaurant
-                  CategorySection(title: "", items: fastFood),
-                  const SizedBox(height: 15),
-
-                  // Randomize Feature
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-                          onPressed: () {
-                            // TODO Implement the randomize feature
-                          },
-                          icon: Text("🚗"),
-                          label: Text("Randomize"),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            );
-          },
+        return BottomSheetList(
+          scrollController: ScrollController(),
+          fastFood: fastFood
         );
-      },
+      }
     );
-  }
-
-  // // Widget for Delivery/Pickup Buttons
-  // Widget _buildOptionButton(String text, String emoji, Color color) {
-  //   return ElevatedButton.icon(
-  //     style: ElevatedButton.styleFrom(backgroundColor: color),
-  //     onPressed: () {},
-  //     icon: Text(emoji),
-  //     label: Text(text),
-  //   );
-  // }
+  } // end _showBottomSheet
 
 } // end MapScreen
 
