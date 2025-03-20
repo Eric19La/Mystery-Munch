@@ -27,8 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           const SizedBox(height: 20),
-          const SearchBarWidget(),
-          const SizedBox(height: 5),
+          Positioned(
+            top: 20,
+            left: 10,
+            right: 10,
+            child: SearchBarWidget()
+          ),
+          const SizedBox(height: 20),
 
           Expanded(
             child: SingleChildScrollView(

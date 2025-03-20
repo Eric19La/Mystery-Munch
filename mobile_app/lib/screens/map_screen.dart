@@ -5,7 +5,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mobile_app/widgets/bottom_sheet_list.dart';
 import '../widgets/search_bar.dart';
-import '../widgets/category_section.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -20,11 +19,14 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Map")),
+      appBar: AppBar(
+        elevation: 0,
+        toolbarHeight: 10,
+      ),
+
+      // Body Section
       body: Stack(
         children: [
-          const SearchBarWidget(),
-          const SizedBox(height: 5),
           // Maps
           FlutterMap(
             options: MapOptions(
@@ -49,6 +51,14 @@ class _MapScreenState extends State<MapScreen> {
                 ],
               ),
             ],
+          ),
+
+          // Search Bar Section
+          Positioned(
+            top: 20,
+            left: 10,
+            right: 10,
+            child: SearchBarWidget()
           ),
         ],
       ),
