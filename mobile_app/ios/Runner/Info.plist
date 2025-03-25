@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>Allow app to access location for recommendations.</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Allow app to access location for recommendations.</string>
+    <key>GMSApiKey</key>
+    <string>AIzaSyDVo8s1pwsKtLGutO4L-yHA1yiMXLnPZ4E</string>
 </dict>
 </plist>

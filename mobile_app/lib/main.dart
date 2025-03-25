@@ -1,7 +1,29 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  //
+  // print("Current Working Directory: ${Directory.current.path}");
+  //
+  // String envPath = ".env"; // Should now be in root directory
+  //
+  // // Check if file exists
+  // bool fileExists = File(envPath).existsSync();
+  // print("Does .env exist? $fileExists");
+  //
+  // if (fileExists) {
+  //   String envFileContent = File(envPath).readAsStringSync();
+  //   print("Manual .env Read:\n$envFileContent");
+  // } else {
+  //   print("ERROR: .env file not found at: $envPath");
+  // }
+  //
+  // await dotenv.load(fileName: "/Users/eric/Desktop/Mystery-Munch/.env");
+
   runApp(const MyApp());
 }
 
