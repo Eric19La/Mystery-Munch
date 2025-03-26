@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_webservice/places.dart';
+
+import '../controllers/nav_controller.dart';
+import '../widgets/bottom_navbar.dart';
+import '../widgets/bottom_sheet_list.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -13,10 +16,11 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late GoogleMapController _mapController;
-  LatLng _currentLocation = const LatLng(34.0522, -118.2437); // Default: LA
+
+  LatLng _currentLocation = const LatLng(34.0522, -118.2437); // Default Example Location: LA
   Set<Marker> _markers = {};
 
-  // 🔥 Hardcoded API Key - Replace with your actual key
+  // Hardcoded API Key - Replace with your actual key
   final String googleApiKey = 'AIzaSyDVo8s1pwsKtLGutO4L-yHA1yiMXLnPZ4E';
   // String googleApiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
 
@@ -98,20 +102,77 @@ class _MapScreenState extends State<MapScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Nearby Restaurants"),
+        elevation: 0,
+        toolbarHeight: 10,
       ),
-      body: GoogleMap(
-        initialCameraPosition: CameraPosition(
-          target: _currentLocation,
-          zoom: 13,
-        ),
-        markers: _markers,
-        onMapCreated: (GoogleMapController controller) {
-          _mapController = controller;
-        },
-        myLocationEnabled: true,
-        myLocationButtonEnabled: true,
+
+      // Body Section
+      body: Stack(
+        children: [
+          // Google Map Implementation
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: _currentLocation,
+              zoom: 13,
+            ),
+            // markers: _markers,
+            markers: {
+              Marker(
+                markerId: const MarkerId('restaurant'),
+                position: _currentLocation,
+                infoWindow: const InfoWindow(title: 'Restaurant'),
+                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                onTap: () {
+                  _showBottomSheet(context, fastFood);
+                },
+              ),
+            },
+            onMapCreated: (GoogleMapController controller) {
+              _mapController = controller;
+            },
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+          ),
+        ],
+      ),
+
+      // Nav Bar Section
+      bottomNavigationBar: BottomNavBar(
+        selectedIndex: 1,
+        onPageSelected: (index) => selectedPage(context, index),
       ),
     );
   }
-}
+
+  // Bottom Sheet for Restaurant Info
+  void _showBottomSheet(BuildContext context, List<Map<String, String>> fastFood) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return BottomSheetList(
+            scrollController: ScrollController(),
+            fastFood: fastFood
+        );
+      }
+    );
+  } // end _showBottomSheet
+
+} // end MapScreenState
+
+// Sample fast food data
+List<Map<String, String>> fastFood = [
+  {
+    "title": "Burgers",
+    "description": "View →",
+    "image": "assets/images/in-n-out.jpeg",
+  },
+  {
+    "title": "Fries",
+    "description": "View →",
+    "image": "assets/images/mcds.jpg"
+  },
+];
