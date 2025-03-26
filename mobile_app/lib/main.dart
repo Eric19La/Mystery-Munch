@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'screens/home_screen.dart';
@@ -24,6 +24,7 @@ void main() async {
   //
   // await dotenv.load(fileName: "/Users/eric/Desktop/Mystery-Munch/.env");
 
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

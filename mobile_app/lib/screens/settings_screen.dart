@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/controllers/nav_controller.dart';
+import 'package:mobile_app/screens/sign_in_screen.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -14,9 +15,18 @@ class SettingsScreen extends StatelessWidget {
         // toolbarHeight: 40,
       ),
       body: ListView(
-        children: const [
+        children: [
           SectionHeader(title: "Profile Info"),
-          ListTile(leading: Icon(Icons.person), title: Text("Edit Profile")),
+          ListTile(
+            leading: Icon(Icons.person),
+            title: Text("Profile"),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SignInScreen()), // Ensure it's properly structured
+              );
+            },
+          ),
           Divider(),
         ],
       ),

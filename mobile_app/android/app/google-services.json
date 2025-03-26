@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "196487791745",
+    "project_id": "mysterymunch",
+    "storage_bucket": "mysterymunch.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:196487791745:android:b474810eeb76d5d67b3980",
+        "android_client_info": {
+          "package_name": "com.example.mobile_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDojl69h_SPHTKqtUeRfTf_SNnycVbhAnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
