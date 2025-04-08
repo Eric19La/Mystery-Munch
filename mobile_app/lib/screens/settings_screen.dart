@@ -10,16 +10,31 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Settings"),
-        // elevation: 0,
-        // toolbarHeight: 40,
+        title: Row(
+          children: [
+            Icon(Icons.settings),
+            SizedBox(width: 12), // Adjust spacing here
+            Text(
+              "Settings",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+              ),
+            ),
+          ],
+        ),
       ),
+
+        // Body Section
       body: ListView(
         children: [
+          const SizedBox(height: 10),
+
+          // Sections
           SectionHeader(title: "Profile Info"),
           ListTile(
             leading: Icon(Icons.person),
-            title: Text("Profile"),
+            title: Text("Account"),
             onTap: () {
               Navigator.push(
                 context,
@@ -28,6 +43,20 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           Divider(),
+
+          SectionHeader(title: "Bookmarks"),
+          ListTile(
+            leading: Icon(Icons.bookmark),
+            title: Text("Saved Restaurants"),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SignInScreen()), // Ensure it's properly structured
+              );
+            },
+          ),
+          Divider(),
+
         ],
       ),
 
@@ -38,9 +67,9 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-}
+} // end SettingsScreen
 
-
+// Returns a widget for the section header
 class SectionHeader extends StatelessWidget {
   final String title;
   const SectionHeader({super.key, required this.title});
@@ -55,4 +84,4 @@ class SectionHeader extends StatelessWidget {
       ),
     );
   }
-}
+} // end SectionHeader
