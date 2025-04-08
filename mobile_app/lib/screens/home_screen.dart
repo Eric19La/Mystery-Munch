@@ -4,6 +4,7 @@ import 'package:mobile_app/widgets/bottom_navbar.dart';
 import '../widgets/category_icon.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/category_section.dart';
+import '../api/places_api.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +15,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late Future<List<Map<String, dynamic>>> fastFoodFuture;
+  late Future<List<Map<String, dynamic>>> asianFoodFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    fastFoodFuture = fetchFoodByKeyword('burger');
+    asianFoodFuture = fetchFoodByKeyword('pho');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,9 +73,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 20),
 
                   // Category Sections
-                  CategorySection(title: "Fast Food", items: fastFood),
-                  CategorySection(title: "Asian Food", items: asianFood),
-                  CategorySection(title: "Food", items: fastFood),
+                  // CategorySection(title: "Fast Food", items: fastFood),
+                  // CategorySection(title: "Asian Food", items: asianFood),
+                  // CategorySection(title: "Food", items: fastFood),
+                  // Category Sections
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: fastFoodFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Error loading Fast Food"));
+                      } else {
+                        return CategorySection(title: "Fast Food", items: snapshot.data!);
+                      }
+                    },
+                  ),
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: asianFoodFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Error loading Asian Food"));
+                      } else {
+                        return CategorySection(title: "Asian Food", items: snapshot.data!);
+                      }
+                    },
+                  ),
+
                 ],
               ),
             ),
@@ -83,29 +120,29 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // Sample fast food data
-List<Map<String, String>> fastFood = [
-  {
-    "title": "In-N-Out Burger",
-    "description": "View →",
-    "image": "assets/images/in-n-out.jpeg",
-  },
-  {
-    "title": "McDonald's",
-    "description": "View →",
-    "image": "assets/images/mcds.jpg"
-  },
-];
+// List<Map<String, String>> fastFood = [
+//   {
+//     "title": "In-N-Out Burger",
+//     "description": "View →",
+//     "image": "assets/images/in-n-out.jpeg",
+//   },
+//   {
+//     "title": "McDonald's",
+//     "description": "View →",
+//     "image": "assets/images/mcds.jpg"
+//   },
+// ];
 
-// Sample asian food data
-List<Map<String, String>> asianFood = [
-  {
-    "title": "Pho",
-    "description": "View →",
-    "image": "assets/images/pho.jpg",
-  },
-  {
-    "title": "Sushi",
-    "description": "View →",
-    "image": "assets/images/sushi.jpg"
-  },
-];
+// // Sample asian food data
+// List<Map<String, String>> asianFood = [
+//   {
+//     "title": "Pho",
+//     "description": "View →",
+//     "image": "assets/images/pho.jpg",
+//   },
+//   {
+//     "title": "Sushi",
+//     "description": "View →",
+//     "image": "assets/images/sushi.jpg"
+//   },
+// ];

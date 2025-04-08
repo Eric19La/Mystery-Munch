@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CategorySection extends StatelessWidget {
   final String title;
-  final List<Map<String, String>> items;
+  final List<Map<String, dynamic>> items;
 
   const CategorySection({super.key, required this.title, required this.items});
 
@@ -35,7 +35,7 @@ class CategorySection extends StatelessWidget {
   }
 
   // Function to create large category cards
-  Widget _buildLargeCategoryCard(Map<String, String> data) {
+  Widget _buildLargeCategoryCard(Map<String, dynamic> data) {
     return Padding(
       padding: const EdgeInsets.only(right: 16),
       child: Container(
@@ -52,11 +52,17 @@ class CategorySection extends StatelessWidget {
             // Background Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
+              child: Image.network(
                 data["image"]!,
                 height: 240,
                 width: double.infinity,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[300],
+                    child: const Center(child: Icon(Icons.broken_image, size: 40)),
+                  );
+                },
               ),
             ),
             // Dark overlay for text readability
