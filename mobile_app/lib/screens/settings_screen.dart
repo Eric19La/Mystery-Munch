@@ -25,7 +25,7 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
 
-        // Body Section
+      // Body Section
       body: ListView(
         children: [
           const SizedBox(height: 10),
@@ -67,6 +67,7 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
+
 } // end SettingsScreen
 
 // Returns a widget for the section header

@@ -1,32 +1,49 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:geolocator/geolocator.dart' as geolocator;
+import 'package:geolocator/geolocator.dart';
 
-// Future<geolocator.Position> getCurrentLocation() async {
-//   bool serviceEnabled = await geolocator.isLocationServiceEnabled();
-//   geolocator.LocationPermission permission = await geolocator.checkPermission();
-//
-//   if (permission == geolocator.LocationPermission.denied) {
-//     permission = await geolocator.requestPermission();
-//   }
-//
-//   return await geolocator.getCurrentPosition(
-//     desiredAccuracy: geolocator.LocationAccuracy.high,
-//   );
-// }
+Future<Position> getCurrentLocation() async {
+  // Check if location services are enabled
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    throw Exception('Location services are disabled.');
+  }
 
-// Async Function that returns a list of maps with the title, description, and image
+  // Check and request permission
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      throw Exception('Location permission denied.');
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    throw Exception('Location permission is permanently denied.');
+  }
+
+  // Get the current position
+  return await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+}
+
+// Async Function that returns a list of restaurants with the title, description, and image
 Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword) async {
-  // final position = await getCurrentLocation();
-  final latitude = 34.0961;
-  final longitude = -118.1058;
+  final position = await getCurrentLocation();
+  final latitude = position.latitude;
+  final longitude = position.longitude;
+
+  // Hardcoded location (SG)
+  // final latitude = 34.0961;
+  // final longitude = -118.1058;
 
   final apiKey = 'AIzaSyDVo8s1pwsKtLGutO4L-yHA1yiMXLnPZ4E';
 
   // Builds a URL to query the Google Places API with Location, Radius, Type, and Keyword
   final url =
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-      '?location=${latitude},${longitude}'
+      '?location=$latitude,$longitude'
       '&radius=3000'
       '&type=restaurant'
       '&keyword=${Uri.encodeComponent(keyword)}'

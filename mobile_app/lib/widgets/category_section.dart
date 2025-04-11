@@ -106,4 +106,5 @@ class CategorySection extends StatelessWidget {
       ),
     );
   }
-}
+
+} // end Class Category Section
