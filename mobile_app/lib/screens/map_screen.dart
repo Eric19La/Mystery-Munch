@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_webservice/places.dart';
+import '../api/places_api.dart';
 import '../controllers/nav_controller.dart';
 import '../widgets/bottom_navbar.dart';
 import '../widgets/bottom_sheet_list.dart';
@@ -14,88 +13,16 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  late GoogleMapController _mapController;
-
-  LatLng _currentLocation = const LatLng(34.0522, -118.2437); // Default Example Location: LA
+  late LatLng _currentLocation;
   Set<Marker> _markers = {};
-
-  // Hardcoded API Key - Replace with your actual key
-  final String googleApiKey = 'AIzaSyDVo8s1pwsKtLGutO4L-yHA1yiMXLnPZ4E';
-  // String googleApiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
+  GoogleMapController? _mapController;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _getUserLocation();
+    _initializeMap();
   }
-
-  // Get User Location
-  bool _hasFetchedPlaces = false;  // Add this to prevent duplicate calls
-
-  Future<void> _getUserLocation() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.deniedForever) {
-        print("Location permissions are permanently denied.");
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      setState(() {
-        _currentLocation = LatLng(position.latitude, position.longitude);
-      });
-
-      if (!_hasFetchedPlaces) {
-        _hasFetchedPlaces = true;
-        _fetchNearbyRestaurants();
-      }
-    } else {
-      print("Location permission denied.");
-    }
-  }
-
-
-  // Fetch Nearby Restaurants
-  Future<void> _fetchNearbyRestaurants() async {
-    final places = GoogleMapsPlaces(apiKey: googleApiKey);
-    final location = Location(lat: _currentLocation.latitude, lng: _currentLocation.longitude);
-
-    print("Fetching nearby restaurants...");
-
-    final result = await places.searchNearbyWithRadius(location, 1500, type: "restaurant");
-
-    print("API Response Status: ${result.status}");
-    print("API Response Error: ${result.errorMessage}");
-
-    if (result.status == "OK") {
-      setState(() {
-        _markers = result.results.map((place) {
-          return Marker(
-            markerId: MarkerId(place.placeId!),
-            position: LatLng(place.geometry!.location.lat, place.geometry!.location.lng),
-            infoWindow: InfoWindow(
-              title: place.name,
-              snippet: place.vicinity,
-            ),
-          );
-        }).toSet();
-      });
-
-      print("Fetched ${_markers.length} restaurants.");
-      for (var marker in _markers) {
-        print("Marker: ${marker.infoWindow.title} at ${marker.position}");
-      }
-    } else {
-      print("Error fetching places: ${result.errorMessage}");
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,26 +33,16 @@ class _MapScreenState extends State<MapScreen> {
       ),
 
       // Body Section
-      body: Stack(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
         children: [
-          // Google Map Implementation
           GoogleMap(
             initialCameraPosition: CameraPosition(
               target: _currentLocation,
-              zoom: 13,
+              zoom: 15,
             ),
-            // markers: _markers,
-            markers: {
-              Marker(
-                markerId: const MarkerId('restaurant'),
-                position: _currentLocation,
-                infoWindow: const InfoWindow(title: 'Restaurant'),
-                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-                onTap: () {
-                  _showBottomSheet(context, fastFood);
-                },
-              ),
-            },
+            markers: _markers,
             onMapCreated: (GoogleMapController controller) {
               _mapController = controller;
             },
@@ -141,6 +58,32 @@ class _MapScreenState extends State<MapScreen> {
         onPageSelected: (index) => selectedPage(context, index),
       ),
     );
+  }
+
+  void _initializeMap() async {
+    try {
+      final position = await getCurrentLocation();
+      _currentLocation = LatLng(position.latitude, position.longitude);
+
+      final places = await fetchNearbyRestaurants(limit: 5);
+
+      Set<Marker> newMarkers = places.map((place) {
+        return Marker(
+          markerId: MarkerId(place['title']),
+          position: LatLng(place['lat'], place['lng']),
+          infoWindow: InfoWindow(title: place['title']),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        );
+      }).toSet();
+
+      setState(() {
+        _markers = newMarkers;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error initializing map: $e');
+      // You could show a SnackBar or error here
+    }
   }
 
   // Bottom Sheet for Restaurant Info

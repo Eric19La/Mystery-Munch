@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 
+// Temp API Key
+const String googlePlacesApiKey = 'AIzaSyDVo8s1pwsKtLGutO4L-yHA1yiMXLnPZ4E';
+
+// Async Function that returns the current location
 Future<Position> getCurrentLocation() async {
   // Check if location services are enabled
   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -38,8 +42,6 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword) async {
   // final latitude = 34.0961;
   // final longitude = -118.1058;
 
-  final apiKey = 'AIzaSyDVo8s1pwsKtLGutO4L-yHA1yiMXLnPZ4E';
-
   // Builds a URL to query the Google Places API with Location, Radius, Type, and Keyword
   final url =
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
@@ -47,7 +49,7 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword) async {
       '&radius=3000'
       '&type=restaurant'
       '&keyword=${Uri.encodeComponent(keyword)}'
-      '&key=$apiKey';
+      '&key=$googlePlacesApiKey';
 
   // Sends a GET request to the URL and waits for the response
   final response = await http.get(Uri.parse(url));
@@ -71,7 +73,7 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword) async {
           imageUrl = 'https://maps.googleapis.com/maps/api/place/photo'
               '?maxwidth=400'
               '&photoreference=$photoRef'
-              '&key=$apiKey';
+              '&key=$googlePlacesApiKey';
         } else {
           imageUrl = 'https://via.placeholder.com/400x200.png?text=No+Image';
         }
@@ -92,3 +94,44 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword) async {
     throw Exception('Failed to load $keyword data');
   }
 }
+
+Future<List<Map<String, dynamic>>> fetchNearbyRestaurants({int limit = 5}) async {
+  final position = await getCurrentLocation();
+  final latitude = position.latitude;
+  final longitude = position.longitude;
+
+  final url =
+      'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+      '?location=$latitude,$longitude'
+      '&radius=3000'
+      '&type=restaurant'
+      '&key=$googlePlacesApiKey';
+
+  final response = await http.get(Uri.parse(url));
+  final data = json.decode(response.body);
+
+  List<Map<String, dynamic>> places = [];
+
+  for (var result in data['results']) {
+    final lat = result['geometry']['location']['lat'];
+    final lng = result['geometry']['location']['lng'];
+
+    final distanceInMeters = Geolocator.distanceBetween(
+      latitude, longitude, lat, lng,
+    );
+
+    places.add({
+      'title': result['name'],
+      'lat': lat,
+      'lng': lng,
+      'distance': distanceInMeters,
+    });
+  }
+
+  // Sort by distance
+  places.sort((a, b) => a['distance'].compareTo(b['distance']));
+
+  return places.take(limit).toList(); // Return only the closest ones
+}
+
+
