@@ -33,7 +33,7 @@ Future<Position> getCurrentLocation() async {
 }
 
 // Async Function that returns a list of restaurants with the title, description, and image
-Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword) async {
+Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword, {int limit = 5}) async {
   final position = await getCurrentLocation();
   final latitude = position.latitude;
   final longitude = position.longitude;
@@ -63,7 +63,7 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword) async {
     try {
       // For each place we extract the name, description, and image URL to convert to a list
       return results
-        .take(5)  // Limit to first 5 search results
+        .take(limit)  // Limit to first 5 search results
         .map<Map<String, dynamic>>((place) {
         String imageUrl;
 
@@ -80,7 +80,7 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword) async {
 
         return {
           'title': place['name'] ?? 'No name',
-          'description': 'View >',
+          // 'description': 'View >',
           'image': imageUrl,
         };
       }).toList();
@@ -112,26 +112,42 @@ Future<List<Map<String, dynamic>>> fetchNearbyRestaurants({int limit = 5}) async
 
   List<Map<String, dynamic>> places = [];
 
-  for (var result in data['results']) {
-    final lat = result['geometry']['location']['lat'];
-    final lng = result['geometry']['location']['lng'];
+  for (var place in data['results']) {
+    if (places.length >= limit) break;
+
+    final lat = place['geometry']['location']['lat'];
+    final lng = place['geometry']['location']['lng'];
 
     final distanceInMeters = Geolocator.distanceBetween(
       latitude, longitude, lat, lng,
     );
 
+    String imageUrl;
+    if (place['photos'] != null && place['photos'].isNotEmpty) {
+      final photoRef = place['photos'][0]['photo_reference'];
+      imageUrl =
+      'https://maps.googleapis.com/maps/api/place/photo'
+          '?maxwidth=400'
+          '&photoreference=$photoRef'
+          '&key=$googlePlacesApiKey';
+    } else {
+      imageUrl = 'https://via.placeholder.com/400x200.png?text=No+Image';
+    }
+
     places.add({
-      'title': result['name'],
+      'title': place['name'] ?? 'No name',
       'lat': lat,
       'lng': lng,
       'distance': distanceInMeters,
+      'image': imageUrl,
     });
   }
 
-  // Sort by distance
+  // Sort by distance before returning
   places.sort((a, b) => a['distance'].compareTo(b['distance']));
 
-  return places.take(limit).toList(); // Return only the closest ones
+  return places;
 }
+
 
 

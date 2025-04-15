@@ -79,9 +79,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 20),
 
                   // Category Sections
-                  CategorySection(title: "Fast Food", items: fastFood),
-                  CategorySection(title: "Asian Food", items: asianFood),
-                  CategorySection(title: "Food", items: fastFood),
+                  CategorySection(title: "Fast Food", items: fastFood, screenContext: 'home',),
+                  CategorySection(title: "Asian Food", items: asianFood, screenContext: 'home',),
+                  CategorySection(title: "Food", items: fastFood, screenContext: 'home',),
 
                   // Category Sections with Real Data from API, currently we want to comment this out so we don't make too many calls when testing
                   // FutureBuilder<List<Map<String, dynamic>>>(
@@ -142,12 +142,12 @@ class _HomeScreenState extends State<HomeScreen> {
 List<Map<String, String>> fastFood = [
   {
     "title": "In-N-Out Burger",
-    "description": "View →",
+    // "description": "View →",
     "image": "assets/images/in-n-out.jpeg",
   },
   {
     "title": "McDonald's",
-    "description": "View →",
+    // "description": "View →",
     "image": "assets/images/mcds.jpg"
   },
 ];
@@ -156,12 +156,12 @@ List<Map<String, String>> fastFood = [
 List<Map<String, String>> asianFood = [
   {
     "title": "Pho",
-    "description": "View →",
+    // "description": "View →",
     "image": "assets/images/pho.jpg",
   },
   {
     "title": "Sushi",
-    "description": "View →",
+    // "description": "View →",
     "image": "assets/images/sushi.jpg"
   },
 ];

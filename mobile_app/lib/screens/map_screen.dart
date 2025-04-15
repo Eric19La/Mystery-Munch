@@ -17,6 +17,7 @@ class _MapScreenState extends State<MapScreen> {
   Set<Marker> _markers = {};
   GoogleMapController? _mapController;
   bool _isLoading = true;
+  List<Map<String, dynamic>> _restaurantList = [];
 
   @override
   void initState() {
@@ -66,6 +67,7 @@ class _MapScreenState extends State<MapScreen> {
       _currentLocation = LatLng(position.latitude, position.longitude);
 
       final places = await fetchNearbyRestaurants(limit: 5);
+      _restaurantList = places;
 
       Set<Marker> newMarkers = places.map((place) {
         return Marker(
@@ -73,6 +75,9 @@ class _MapScreenState extends State<MapScreen> {
           position: LatLng(place['lat'], place['lng']),
           infoWindow: InfoWindow(title: place['title']),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          onTap: () {
+            _showBottomSheet(context, place);
+          },
         );
       }).toSet();
 
@@ -87,7 +92,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   // Bottom Sheet for Restaurant Info
-  void _showBottomSheet(BuildContext context, List<Map<String, String>> fastFood) {
+  void _showBottomSheet(BuildContext context, Map<String, dynamic> place) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -96,12 +101,19 @@ class _MapScreenState extends State<MapScreen> {
       ),
       builder: (context) {
         return BottomSheetList(
-            scrollController: ScrollController(),
-            fastFood: fastFood
+          scrollController: ScrollController(),
+          restaurant: [ // 👈 Wrap single place in a list
+            {
+              'title': place['title'],
+              'image': place['image'],
+            }
+          ],
         );
-      }
+      },
     );
-  } // end _showBottomSheet
+  }
+
+
 
 } // end MapScreenState
 

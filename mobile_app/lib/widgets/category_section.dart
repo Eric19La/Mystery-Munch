@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 class CategorySection extends StatelessWidget {
   final String title;
   final List<Map<String, dynamic>> items;
+  final String screenContext;
 
-  const CategorySection({super.key, required this.title, required this.items});
+  const CategorySection({
+    super.key,
+    required this.title,
+    required this.items,
+    this.screenContext = 'home',
+  });
 
+  // Build the text displaced on the CategorySection
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -24,7 +31,8 @@ class CategorySection extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               itemCount: items.length,
               itemBuilder: (context, index) {
-                return _buildLargeCategoryCard(items[index]);
+                bool isFirstSpecialCard = index == 0 && screenContext == 'map';
+                return _buildLargeCategoryCard(items[index], isFirstSpecialCard);
               },
             ),
           ),
@@ -34,12 +42,12 @@ class CategorySection extends StatelessWidget {
     );
   }
 
-  // Function to create large category cards
-  Widget _buildLargeCategoryCard(Map<String, dynamic> data) {
+  // Create large category cards
+  Widget _buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
     return Padding(
       padding: const EdgeInsets.only(right: 16),
       child: Container(
-        width: 300, // Width of each category card
+        width: isMapScreen ? 370 : 300,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: Colors.amber[20],
@@ -49,7 +57,6 @@ class CategorySection extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Background Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
@@ -57,15 +64,12 @@ class CategorySection extends StatelessWidget {
                 height: 240,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[300],
-                    child: const Center(child: Icon(Icons.broken_image, size: 40)),
-                  );
-                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey[300],
+                  child: const Center(child: Icon(Icons.broken_image, size: 40)),
+                ),
               ),
             ),
-            // Dark overlay for text readability
             Container(
               height: 240,
               decoration: BoxDecoration(
@@ -77,7 +81,6 @@ class CategorySection extends StatelessWidget {
                 ),
               ),
             ),
-            // Text Content
             Positioned(
               bottom: 20,
               left: 16,
@@ -92,11 +95,6 @@ class CategorySection extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    data["description"]!,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                 ],
               ),

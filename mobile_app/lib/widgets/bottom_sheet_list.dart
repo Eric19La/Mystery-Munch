@@ -4,9 +4,9 @@ import 'category_section.dart';
 
 class BottomSheetList extends StatelessWidget {
   final ScrollController scrollController;
-  final List<Map<String, String>> fastFood;  // Expecting list of fast food images
+  final List<Map<String, dynamic>> restaurant;  // Expecting list of fast food images
 
-  const BottomSheetList({Key? key, required this.scrollController, required this.fastFood}) : super(key: key);
+  const BottomSheetList({Key? key, required this.scrollController, required this.restaurant}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,31 +34,8 @@ class BottomSheetList extends StatelessWidget {
                 ),
               ),
 
-              // Restaurant Info
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "In-N-Out",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: const [
-                        Icon(Icons.star, color: Colors.yellow, size: 20),
-                        Text(" 4.4 (500+) • \$ • 900 ft"),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    const Text("🟢 Open • Closes at 1:30 AM", style: TextStyle(color: Colors.green)),
-                  ],
-                ),
-              ),
-
               // Food Images (CategorySection)
-              CategorySection(title: "", items: fastFood),
+              CategorySection(title: "", items: restaurant, screenContext: 'map',),
 
               // Randomize Feature
               Padding(
