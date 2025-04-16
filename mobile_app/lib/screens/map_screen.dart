@@ -92,26 +92,36 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   // Bottom Sheet for Restaurant Info
-  void _showBottomSheet(BuildContext context, Map<String, dynamic> place) {
+  void _showBottomSheet(BuildContext context, Map<String, dynamic> selectedRestaurant) {
+    final reorderedRestaurants = [
+      selectedRestaurant,
+      ..._restaurantList.where(
+            (r) => r['title'] != selectedRestaurant['title'],
+      ),
+    ];
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) {
-        return BottomSheetList(
-          scrollController: ScrollController(),
-          restaurant: [ // 👈 Wrap single place in a list
-            {
-              'title': place['title'],
-              'image': place['image'],
-            }
-          ],
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.45,
+          minChildSize: 0.3,
+          maxChildSize: 0.85,
+          builder: (_, scrollController) {
+            return BottomSheetList(
+              restaurant: reorderedRestaurants,
+              scrollController: scrollController,
+            );
+          },
         );
       },
     );
   }
+
+
 
 
 

@@ -32,7 +32,7 @@ class CategorySection extends StatelessWidget {
               itemCount: items.length,
               itemBuilder: (context, index) {
                 bool isFirstSpecialCard = index == 0 && screenContext == 'map';
-                return _buildLargeCategoryCard(items[index], isFirstSpecialCard);
+                return buildLargeCategoryCard(items[index], isFirstSpecialCard);
               },
             ),
           ),
@@ -42,67 +42,67 @@ class CategorySection extends StatelessWidget {
     );
   }
 
-  // Create large category cards
-  Widget _buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 16),
-      child: Container(
-        width: isMapScreen ? 370 : 300,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.amber[20],
-          boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 5),
-          ],
-        ),
-        child: Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                data["image"]!,
-                height: 240,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey[300],
-                  child: const Center(child: Icon(Icons.broken_image, size: 40)),
-                ),
-              ),
-            ),
-            Container(
-              height: 240,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [Colors.black.withOpacity(0.7), Colors.transparent],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 20,
-              left: 16,
-              right: 16,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    data["title"]!,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
 } // end Class Category Section
+
+// Create large category cards
+Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
+  return Padding(
+    padding: const EdgeInsets.only(right: 16),
+    child: Container(
+      width: isMapScreen ? 370 : 300,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Colors.amber[20],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 5),
+        ],
+      ),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              data["image"]!,
+              height: 240,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey[300],
+                child: const Center(child: Icon(Icons.broken_image, size: 40)),
+              ),
+            ),
+          ),
+          Container(
+            height: 240,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            left: 16,
+            right: 16,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data["title"]!,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
