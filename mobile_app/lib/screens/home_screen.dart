@@ -15,21 +15,28 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Initialize the futures
-  late Future<List<Map<String, dynamic>>> foodNearbyFuture; // Used for searching food nearby your location
-  late Future<List<Map<String, dynamic>>> asianFoodFuture;  // Used for searching asian food nearby your location
-  late Future<List<Map<String, dynamic>>> noodleFoodFuture;  // Used for searching noodle soup nearby your location
+  List<Map<String, dynamic>> nearbyRestaurants = [];   // List of nearby restaurants
+  Map<String, List<Map<String, dynamic>>> filteredSections = {};  // Map of filtered sections
+  List<String> selectedFilters = [];  // List of selected filters
+  bool isLoadingNearby = false; // Loading state for nearby restaurants
+  bool isLoadingFilters = false;  // Loading state for filtered sections
 
   @override
   void initState() {
     super.initState();
-
-    // Fetch data when the widget is initialized
-    // Comment this out atm so we don't make too many calls when testing
-    // foodNearbyFuture = fetchFoodByKeyword('food');
-    // asianFoodFuture = fetchFoodByKeyword('asian');
-    // noodleFoodFuture = fetchFoodByKeyword('pho');
+    fetchNearbyFood();  // Fetch nearby restaurants on initialization
+    fetchAndUpdateRestaurants();  // Fetch and update filtered sections on initialization
   }
+
+  // List of categories the user is able to select
+  final categories = [
+    {"icon": Icons.fastfood, "label": "Fast Food"},
+    {"icon": Icons.local_drink, "label": "Drinks"},
+    {"icon": Icons.coffee, "label": "Coffee"},
+    {"icon": Icons.restaurant_menu, "label": "Cuisine"},
+    {"icon": Icons.soup_kitchen, "label": "Soup"},
+    {"icon": Icons.filter_list_alt, "label": "Filter"},
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -64,63 +71,45 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
-                      children: [
-                        CategoryIcon(Icons.location_pin, "Location"),
-                        CategoryIcon(Icons.price_change, "Price"),
-                        CategoryIcon(Icons.restaurant_menu, "Cuisine"),
-                        CategoryIcon(Icons.fastfood, "Fast Food"),
-                        CategoryIcon(Icons.local_drink, "Drinks"),
-                        CategoryIcon(Icons.coffee, "Coffee"),
-                        CategoryIcon(Icons.soup_kitchen, "Soup"),
-                        CategoryIcon(Icons.filter_list_alt, "Filter"),
-                      ],
+                      children: categories.map((category) {
+                        final label = category['label'] as String;  // Get the label of the category
+                        final isSelected = selectedFilters.contains(label.toLowerCase()); // Check if the category is selected
+
+                        // Build the category icon
+                        return CategoryIcon(
+                          category['icon'] as IconData,
+                          label,
+                          selected: isSelected,
+                          onTap: () {
+                            setState(() {
+                              isSelected
+                                  ? selectedFilters.remove(label.toLowerCase())
+                                  : selectedFilters.add(label.toLowerCase());
+                            });
+                            fetchAndUpdateRestaurants();
+                          },
+                        );
+                      }).toList(),
+
                     ),
                   ),
                   const SizedBox(height: 20),
 
-                  // Category Sections
-                  CategorySection(title: "Fast Food", items: fastFood, screenContext: 'home',),
-                  CategorySection(title: "Asian Food", items: asianFood, screenContext: 'home',),
-                  CategorySection(title: "Food", items: fastFood, screenContext: 'home',),
+                  // 🍽️ Always show nearby food
+                  isLoadingNearby
+                    ? const Center(child: CircularProgressIndicator())
+                    : CategorySection(title: "Food Nearby", items: nearbyRestaurants),
 
-                  // Category Sections with Real Data from API, currently we want to comment this out so we don't make too many calls when testing
-                  // FutureBuilder<List<Map<String, dynamic>>>(
-                  //   future: foodNearbyFuture,
-                  //   builder: (context, snapshot) {
-                  //     if (snapshot.connectionState == ConnectionState.waiting) {
-                  //       return Center(child: CircularProgressIndicator());
-                  //     } else if (snapshot.hasError) {
-                  //       return Center(child: Text("Error loading Fast Food"));
-                  //     } else {
-                  //       return CategorySection(title: "Food Nearby", items: snapshot.data!);
-                  //     }
-                  //   },
-                  // ),
-                  // FutureBuilder<List<Map<String, dynamic>>>(
-                  //   future: asianFoodFuture,
-                  //   builder: (context, snapshot) {
-                  //     if (snapshot.connectionState == ConnectionState.waiting) {
-                  //       return Center(child: CircularProgressIndicator());
-                  //     } else if (snapshot.hasError) {
-                  //       return Center(child: Text("Error loading Asian Food"));
-                  //     } else {
-                  //       return CategorySection(title: "Asian Cuisine", items: snapshot.data!);
-                  //     }
-                  //   },
-                  // ),
-                  // FutureBuilder<List<Map<String, dynamic>>>(
-                  //   future: noodleFoodFuture,
-                  //   builder: (context, snapshot) {
-                  //     if (snapshot.connectionState == ConnectionState.waiting) {
-                  //       return Center(child: CircularProgressIndicator());
-                  //     } else if (snapshot.hasError) {
-                  //       return Center(child: Text("Error loading Asian Food"));
-                  //     } else {
-                  //       return CategorySection(title: "Noodle", items: snapshot.data!);
-                  //     }
-                  //   },
-                  // ),
+                  const SizedBox(height: 20),
 
+                  // 🧠 Filtered Sections — make sure data exists before showing
+                  // for (String keyword in List.from(selectedFilters))
+                  //   if (filteredSections.containsKey(keyword.toLowerCase()) &&
+                  //       filteredSections[keyword.toLowerCase()] != null)
+                  //     CategorySection(
+                  //       title: keyword,
+                  //       items: filteredSections[keyword.toLowerCase()]!,
+                  //     )
                 ],
               ),
             ),
@@ -136,7 +125,51 @@ class _HomeScreenState extends State<HomeScreen> {
 
     );
   }
-}
+
+  // Function to get the nearby food
+  void fetchNearbyFood() async {
+    setState(() => isLoadingNearby = true); // Set loading state to true
+
+    // Fetch for nearby food
+    final results = await fetchFoodByKeywordList(['food']);
+
+    // Update the state with the results
+    setState(() {
+      nearbyRestaurants = results;
+      isLoadingNearby = false;
+    });
+  }
+
+  // Function update filtered sections
+  void fetchAndUpdateRestaurants() async {
+    setState(() => isLoadingFilters = true);
+
+    // Loops through the selected filters and fetches the results
+    for (String keyword in List.from(selectedFilters)) {
+      final key = keyword.toLowerCase();  // Makes sure the keyword matches with one of the categories above
+
+      // Prevent duplicate fetches
+      if (filteredSections.containsKey(key)) continue;
+
+      try {
+        // Fetch the results for the keyword
+        final results = await fetchFoodByKeywordList([key]);
+
+        // Update the state with the results
+        setState(() {
+          filteredSections[key] = results;
+        });
+      } catch (e) {
+        print("❌ Failed to fetch results for $key: $e");
+      }
+    }
+
+    // Set loading state to false
+    setState(() => isLoadingFilters = false);
+  }
+  
+} // end HomeScreenState
+
 
 // Sample fast food data
 List<Map<String, String>> fastFood = [

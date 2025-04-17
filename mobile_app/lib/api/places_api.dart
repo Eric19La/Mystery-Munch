@@ -33,70 +33,95 @@ Future<Position> getCurrentLocation() async {
 }
 
 // Async Function that returns a list of restaurants with the title, description, and image
-Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword, {int limit = 5}) async {
+Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords, {int limit = 2}) async {
   final position = await getCurrentLocation();
   final latitude = position.latitude;
   final longitude = position.longitude;
 
-  // Hardcoded location (SG)
-  // final latitude = 34.0961;
-  // final longitude = -118.1058;
+  List<Map<String, dynamic>> allResults = [];
 
-  // Builds a URL to query the Google Places API with Location, Radius, Type, and Keyword
-  final url =
-      'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-      '?location=$latitude,$longitude'
-      '&radius=3000'
-      '&type=restaurant'
-      '&keyword=${Uri.encodeComponent(keyword)}'
-      '&key=$googlePlacesApiKey';
+  for (String keyword in keywords) {
+    // Builds a URL to query the Google Places API with Location, Radius, Type, and Keyword
+    final url =
+        'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+        '?location=$latitude,$longitude'
+        '&radius=3000'
+        '&type=restaurant'
+        '&keyword=${Uri.encodeComponent(keyword)}'
+        '&key=$googlePlacesApiKey';
 
-  // Sends a GET request to the URL and waits for the response
-  final response = await http.get(Uri.parse(url));
+    // Sends a GET request to the URL and waits for the response
+    final response = await http.get(Uri.parse(url));
 
-  // Check the response status
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body); // Decode the JSON response
-    final results = data['results'];
-    print("✅ API Response: ${results.length} results for '$keyword'");
+    // Check the response status
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body); // Decode the JSON response
+      final results = data['results'] as List;
+      // print("✅ API Response: ${results.length} results for '$keyword'");
 
-    try {
-      // For each place we extract the name, description, and image URL to convert to a list
-      return results
-        .take(limit)  // Limit to first 5 search results
-        .map<Map<String, dynamic>>((place) {
-        String imageUrl;
+      final filtered = results.take(limit).map<Map<String, dynamic>>((place) {
+        String imageUrl = 'https://via.placeholder.com/400';
 
-        // If the place has an image, use it, otherwise use a placeholder
         if (place['photos'] != null && place['photos'].isNotEmpty) {
           final photoRef = place['photos'][0]['photo_reference'];
-          imageUrl = 'https://maps.googleapis.com/maps/api/place/photo'
+          imageUrl =
+          'https://maps.googleapis.com/maps/api/place/photo'
               '?maxwidth=400'
               '&photoreference=$photoRef'
               '&key=$googlePlacesApiKey';
-        } else {
-          imageUrl = 'https://via.placeholder.com/400x200.png?text=No+Image';
         }
 
         return {
           'title': place['name'] ?? 'No name',
-          // 'description': 'View >',
+          // 'description': place['vicinity'] ?? '',
           'image': imageUrl,
         };
       }).toList();
-    } catch (e) {
-      // print('🔥 Error parsing results: $e');
-      throw Exception('Failed to parse $keyword data');
+
+      allResults.addAll(filtered);
     }
-  } else {
-    // print("❌ API call failed with status: ${response.statusCode}");
-    // print("❌ Response body: ${response.body}");
-    throw Exception('Failed to load $keyword data');
   }
+
+  return allResults;
 }
 
+  //   try {
+  //     // For each place we extract the name, description, and image URL to convert to a list
+  //     return results
+  //       .take(limit)  // Limit to first 5 search results
+  //       .map<Map<String, dynamic>>((place) {
+  //       String imageUrl;
+  //
+  //       // If the place has an image, use it, otherwise use a placeholder
+  //       if (place['photos'] != null && place['photos'].isNotEmpty) {
+  //         final photoRef = place['photos'][0]['photo_reference'];
+  //         imageUrl = 'https://maps.googleapis.com/maps/api/place/photo'
+  //             '?maxwidth=400'
+  //             '&photoreference=$photoRef'
+  //             '&key=$googlePlacesApiKey';
+  //       } else {
+  //         imageUrl = 'https://via.placeholder.com/400x200.png?text=No+Image';
+  //       }
+  //
+  //       return {
+  //         'title': place['name'] ?? 'No name',
+  //         'image': imageUrl,
+  //       };
+  //     }).toList();
+  //   } catch (e) {
+  //     // print('🔥 Error parsing results: $e');
+  //     throw Exception('Failed to parse $keyword data');
+  //   }
+  // } else {
+  //   // print("❌ API call failed with status: ${response.statusCode}");
+  //   // print("❌ Response body: ${response.body}");
+  //   throw Exception('Failed to load $keyword data');
+  // }
+// }
+
+// This is for the Map Screen
 // Async function that returns a Future of a list of maps with each map containing restaurant data, also accepts a parameter for the limit of results
-Future<List<Map<String, dynamic>>> fetchNearbyRestaurants({int limit = 5}) async {
+Future<List<Map<String, dynamic>>> fetchNearbyRestaurants({int limit = 2}) async {
   // Get the current location and stores the lat and long values
   final position = await getCurrentLocation();
   final latitude = position.latitude;

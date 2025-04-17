@@ -46,6 +46,8 @@ class CategorySection extends StatelessWidget {
 
 // Create large category cards
 Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
+  final imageUrl = data["image"] ?? 'https://via.placeholder.com/400';
+
   return Padding(
     padding: const EdgeInsets.only(right: 16),
     child: Container(
@@ -62,7 +64,7 @@ Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: Image.network(
-              data["image"]!,
+              imageUrl,
               height: 240,
               width: double.infinity,
               fit: BoxFit.cover,
@@ -93,7 +95,7 @@ Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  data["title"]!,
+                  data["title"] ?? 'Unnamed',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
