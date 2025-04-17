@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Set loading state to false
     setState(() => isLoadingFilters = false);
   }
-  
+
 } // end HomeScreenState
 
 

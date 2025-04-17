@@ -34,12 +34,16 @@ Future<Position> getCurrentLocation() async {
 
 // Async Function that returns a list of restaurants with the title, description, and image
 Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords, {int limit = 2}) async {
-  final position = await getCurrentLocation();
+  final position = await getCurrentLocation();  // Get the current location
+
+  // Extract the latitude and longitude
   final latitude = position.latitude;
   final longitude = position.longitude;
 
+  // Create a list to store all the results
   List<Map<String, dynamic>> allResults = [];
 
+  // Loop through each keyword
   for (String keyword in keywords) {
     // Builds a URL to query the Google Places API with Location, Radius, Type, and Keyword
     final url =
@@ -59,7 +63,10 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords,
       final results = data['results'] as List;
       // print("✅ API Response: ${results.length} results for '$keyword'");
 
+      // Loop through the results and extract the name, description, and image URL
       final filtered = results.take(limit).map<Map<String, dynamic>>((place) {
+
+        // If the photo has an image, use it, otherwise use a placeholder
         String imageUrl = 'https://via.placeholder.com/400';
 
         if (place['photos'] != null && place['photos'].isNotEmpty) {
@@ -71,17 +78,19 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords,
               '&key=$googlePlacesApiKey';
         }
 
+        // Return the restaurant data
         return {
           'title': place['name'] ?? 'No name',
-          // 'description': place['vicinity'] ?? '',
           'image': imageUrl,
         };
       }).toList();
 
+      // Add the filtered results to the allResults list
       allResults.addAll(filtered);
     }
   }
 
+  // Return the final list of all results
   return allResults;
 }
 
