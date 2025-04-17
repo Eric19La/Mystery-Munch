@@ -95,11 +95,14 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeyword(String keyword, {int limit
   }
 }
 
+// Async function that returns a Future of a list of maps with each map containing restaurant data, also accepts a parameter for the limit of results
 Future<List<Map<String, dynamic>>> fetchNearbyRestaurants({int limit = 5}) async {
+  // Get the current location and stores the lat and long values
   final position = await getCurrentLocation();
   final latitude = position.latitude;
   final longitude = position.longitude;
 
+  // Calls the Google Places API to get nearby restaurants
   final url =
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
       '?location=$latitude,$longitude'
@@ -107,21 +110,27 @@ Future<List<Map<String, dynamic>>> fetchNearbyRestaurants({int limit = 5}) async
       '&type=restaurant'
       '&key=$googlePlacesApiKey';
 
+  // Sends the request to Google and converts the response from JSON into Dart
   final response = await http.get(Uri.parse(url));
   final data = json.decode(response.body);
 
-  List<Map<String, dynamic>> places = [];
+  List<Map<String, dynamic>> places = []; // Create a list to store the results
 
+  // Loop through results and format restaurant data
   for (var place in data['results']) {
-    if (places.length >= limit) break;
+    // Loop through data['results'] which contains a list of places Google found
+    if (places.length >= limit) break;  // Stop once you reach the limit
 
+    // Pulls latitude/longitude from the result
     final lat = place['geometry']['location']['lat'];
     final lng = place['geometry']['location']['lng'];
 
+    // Calculates distance from your current location to the restaurant
     final distanceInMeters = Geolocator.distanceBetween(
       latitude, longitude, lat, lng,
     );
 
+    // Getting the photo URL if available
     String imageUrl;
     if (place['photos'] != null && place['photos'].isNotEmpty) {
       final photoRef = place['photos'][0]['photo_reference'];
@@ -134,6 +143,7 @@ Future<List<Map<String, dynamic>>> fetchNearbyRestaurants({int limit = 5}) async
       imageUrl = 'https://via.placeholder.com/400x200.png?text=No+Image';
     }
 
+    // Add the restaurant data to the list
     places.add({
       'title': place['name'] ?? 'No name',
       'lat': lat,
@@ -146,6 +156,7 @@ Future<List<Map<String, dynamic>>> fetchNearbyRestaurants({int limit = 5}) async
   // Sort by distance before returning
   places.sort((a, b) => a['distance'].compareTo(b['distance']));
 
+  // Return the final list
   return places;
 }
 

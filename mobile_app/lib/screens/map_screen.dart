@@ -13,16 +13,17 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  late LatLng _currentLocation;
-  Set<Marker> _markers = {};
-  GoogleMapController? _mapController;
-  bool _isLoading = true;
-  List<Map<String, dynamic>> _restaurantList = [];
+  bool _isLoading = true; // Loading state
+
+  late LatLng _currentLocation; // Location of the user
+  Set<Marker> _markers = {};  // List of markers
+  GoogleMapController? _mapController;  // Controller for the map
+  List<Map<String, dynamic>> _restaurantList = [];  // List of restaurants
 
   @override
   void initState() {
     super.initState();
-    _initializeMap();
+    _initializeMap(); // Initialize the map when the screen loads
   }
 
   @override
@@ -41,7 +42,7 @@ class _MapScreenState extends State<MapScreen> {
           GoogleMap(
             initialCameraPosition: CameraPosition(
               target: _currentLocation,
-              zoom: 15,
+              zoom: 13,
             ),
             markers: _markers,
             onMapCreated: (GoogleMapController controller) {
@@ -61,20 +62,24 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  // Function to initialize the map
   void _initializeMap() async {
     try {
+      // Gets the user's current location and saves it into _currentLocation
       final position = await getCurrentLocation();
       _currentLocation = LatLng(position.latitude, position.longitude);
 
+      // Fetch nearby restaurants (For testing purposes use 5 we can change this num in the future)
       final places = await fetchNearbyRestaurants(limit: 5);
-      _restaurantList = places;
+      _restaurantList = places; // Save the fetched restaurants in _restaurantList
 
+      // Create markers for each restaurant by looping through all restaurants
       Set<Marker> newMarkers = places.map((place) {
         return Marker(
           markerId: MarkerId(place['title']),
           position: LatLng(place['lat'], place['lng']),
           infoWindow: InfoWindow(title: place['title']),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
           onTap: () {
             _showBottomSheet(context, place);
           },
@@ -91,52 +96,27 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  // Bottom Sheet for Restaurant Info
+  // Function that takes the selected restaurant and builds the bottom sheet when a marker is tapped
   void _showBottomSheet(BuildContext context, Map<String, dynamic> selectedRestaurant) {
+    // Reorder the list to put the selected restaurant at the top
     final reorderedRestaurants = [
       selectedRestaurant,
       ..._restaurantList.where(
-            (r) => r['title'] != selectedRestaurant['title'],
+        (r) => r['title'] != selectedRestaurant['title'], // We don't want to include the selected restaurant in the list
       ),
     ];
 
+    // Displays a scrollable bottom sheet
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.45,
-          minChildSize: 0.3,
-          maxChildSize: 0.85,
-          builder: (_, scrollController) {
-            return BottomSheetList(
-              restaurant: reorderedRestaurants,
-              scrollController: scrollController,
-            );
-          },
-        );
+        return BottomSheetList(restaurant: reorderedRestaurants, scrollController: ScrollController());
       },
     );
   }
 
-
-
-
-
 } // end MapScreenState
-
-// Sample fast food data
-List<Map<String, String>> fastFood = [
-  {
-    "title": "Burgers",
-    "description": "View →",
-    "image": "assets/images/in-n-out.jpeg",
-  },
-  {
-    "title": "Fries",
-    "description": "View →",
-    "image": "assets/images/mcds.jpg"
-  },
-];

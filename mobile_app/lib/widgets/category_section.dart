@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CategorySection extends StatelessWidget {
-  final String title;
-  final List<Map<String, dynamic>> items;
-  final String screenContext;
+  final String title;  // Title of the category
+  final List<Map<String, dynamic>> items; // List of items in the category (asians, fast food, etc)
+  final String screenContext; // Context of the screen (home or map)
 
   const CategorySection({
     super.key,
@@ -49,7 +49,7 @@ Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
   return Padding(
     padding: const EdgeInsets.only(right: 16),
     child: Container(
-      width: isMapScreen ? 370 : 300,
+      width: isMapScreen ? 380 : 300,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: Colors.amber[20],
@@ -83,6 +83,8 @@ Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
               ),
             ),
           ),
+
+          // Title Section of the Restaurant
           Positioned(
             bottom: 20,
             left: 16,
@@ -98,6 +100,18 @@ Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
                     color: Colors.white,
                   ),
                 ),
+
+                const SizedBox(height: 4),
+                // ✅ Show distance only if this card is used in the map screen
+                isMapScreen && data["distance"] != null
+                  ? Text(
+                  '${(data["distance"] as double).toStringAsFixed(0)} meters away',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                )
+                  : const SizedBox.shrink(),
               ],
             ),
           ),
