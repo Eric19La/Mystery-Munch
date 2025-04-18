@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/controllers/nav_controller.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
+import '../api/places_api.dart';
 import '../widgets/category_icon.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/category_section.dart';
-import '../api/places_api.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,12 +30,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // List of categories the user is able to select
   final categories = [
-    {"icon": Icons.fastfood, "label": "Fast Food"},
-    {"icon": Icons.local_drink, "label": "Drinks"},
-    {"icon": Icons.coffee, "label": "Coffee"},
-    {"icon": Icons.restaurant_menu, "label": "Cuisine"},
-    {"icon": Icons.soup_kitchen, "label": "Soup"},
-    {"icon": Icons.filter_list_alt, "label": "Filter"},
+    {"icon": Icons.restaurant_menu, "label": "Grub", "value": "restaurants"},
+    {"icon": Icons.fastfood, "label": "Fast Food", "value": "fast food"},
+    {"icon": Icons.coffee, "label": "Brews", "value": "coffee & tea"},
+    {"icon": Icons.cake, "label": "Desserts", "value": "desserts"},
+    {"icon": Icons.soup_kitchen, "label": "Soup", "value": "soup"},
+    {"icon": Icons.liquor_sharp, "label": "Drinks", "value": "drinks"},
+    // {"icon": Icons.filter_list_alt, "label": "Filter"},
   ];
 
   @override
@@ -72,8 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       children: categories.map((category) {
-                        final label = category['label'] as String;  // Get the label of the category
-                        final isSelected = selectedFilters.contains(label.toLowerCase()); // Check if the category is selected
+                        final label = category['label'] as String? ?? 'No label';  // Get the label of the category
+                        final value = category['value'] as String? ?? 'No value';  // Get the value of the category used for API calls
+                        final isSelected = selectedFilters.contains(value.toLowerCase()); // Check if the category is selected
 
                         // Build the category icon
                         return CategoryIcon(
@@ -83,8 +85,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           onTap: () {
                             setState(() {
                               isSelected
-                                  ? selectedFilters.remove(label.toLowerCase())
-                                  : selectedFilters.add(label.toLowerCase());
+                                  ? selectedFilters.remove(value.toLowerCase())
+                                  : selectedFilters.add(value.toLowerCase());
                             });
                             fetchAndUpdateRestaurants();
                           },
@@ -103,13 +105,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 20),
 
                   // 🧠 Filtered Sections — make sure data exists before showing
-                  // for (String keyword in List.from(selectedFilters))
-                  //   if (filteredSections.containsKey(keyword.toLowerCase()) &&
-                  //       filteredSections[keyword.toLowerCase()] != null)
-                  //     CategorySection(
-                  //       title: keyword,
-                  //       items: filteredSections[keyword.toLowerCase()]!,
-                  //     )
+                  for (String keyword in List.from(selectedFilters))
+                    //
+                    if (filteredSections.containsKey(keyword.toLowerCase()) &&
+                        filteredSections[keyword.toLowerCase()] != null)
+                      CategorySection(
+                        title: toTitleCase(keyword),
+                        items: filteredSections[keyword.toLowerCase()]!,
+                      )
+
                 ],
               ),
             ),
@@ -166,6 +170,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Set loading state to false
     setState(() => isLoadingFilters = false);
+  }
+
+  // Help function that converts a string to title case
+  String toTitleCase(String text) {
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
   }
 
 } // end HomeScreenState
