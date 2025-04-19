@@ -32,10 +32,18 @@ class _HomeScreenState extends State<HomeScreen> {
   final categories = [
     {"icon": Icons.restaurant_menu, "label": "Grub", "value": "restaurants"},
     {"icon": Icons.fastfood, "label": "Fast Food", "value": "fast food"},
-    {"icon": Icons.coffee, "label": "Brews", "value": "coffee & tea"},
     {"icon": Icons.cake, "label": "Desserts", "value": "desserts"},
+    {"icon": Icons.coffee, "label": "Coffee", "value": "coffee"},
+    {"icon": Icons.circle_outlined, "label": "Boba", "value": "milk tea"},
     {"icon": Icons.soup_kitchen, "label": "Soup", "value": "soup"},
+    {"icon": Icons.local_pizza, "label": "Pizza", "value": "pizza"},
+    {"icon": Icons.egg_rounded, "label": "Breakfast", "value": "breakfast food"},
+    {"icon": Icons.rice_bowl_sharp, "label": "Chinese", "value": "chinese food"},
+    {"icon": Icons.ramen_dining_sharp, "label": "Japanese", "value": "japanese food"},
+    {"icon": Icons.local_fire_department_sharp, "label": "Mexican", "value": "mexican food"},
+    {"icon": Icons.room_service_sharp, "label": "Italian", "value": "italian food"},
     {"icon": Icons.liquor_sharp, "label": "Drinks", "value": "drinks"},
+    {"icon": Icons.forest_sharp, "label": "Healthy", "value": "salad"},
     // {"icon": Icons.filter_list_alt, "label": "Filter"},
   ];
 
@@ -51,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // Body Section
       body: Column(
         children: [
+          // Search Bar
           const SizedBox(height: 20),
           Positioned(
             top: 20,
@@ -97,14 +106,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // 🍽️ Always show nearby food
+                  // Always show nearby food
                   isLoadingNearby
                     ? const Center(child: CircularProgressIndicator())
                     : CategorySection(title: "Food Nearby", items: nearbyRestaurants),
 
                   const SizedBox(height: 20),
 
-                  // 🧠 Filtered Sections — make sure data exists before showing
+                  // Filtered Sections — make sure data exists before showing
                   for (String keyword in List.from(selectedFilters))
                     //
                     if (filteredSections.containsKey(keyword.toLowerCase()) &&
@@ -181,32 +190,3 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 } // end HomeScreenState
-
-
-// Sample fast food data
-List<Map<String, String>> fastFood = [
-  {
-    "title": "In-N-Out Burger",
-    // "description": "View →",
-    "image": "assets/images/in-n-out.jpeg",
-  },
-  {
-    "title": "McDonald's",
-    // "description": "View →",
-    "image": "assets/images/mcds.jpg"
-  },
-];
-
-// Sample asian food data
-List<Map<String, String>> asianFood = [
-  {
-    "title": "Pho",
-    // "description": "View →",
-    "image": "assets/images/pho.jpg",
-  },
-  {
-    "title": "Sushi",
-    // "description": "View →",
-    "image": "assets/images/sushi.jpg"
-  },
-];

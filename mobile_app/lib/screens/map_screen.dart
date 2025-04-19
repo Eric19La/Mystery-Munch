@@ -70,7 +70,7 @@ class _MapScreenState extends State<MapScreen> {
       _currentLocation = LatLng(position.latitude, position.longitude);
 
       // Fetch nearby restaurants (For testing purposes use 5 we can change this num in the future)
-      final places = await fetchNearbyRestaurants(limit: 5);
+      final places = await fetchFoodByKeywordList(['food']);
       _restaurantList = places; // Save the fetched restaurants in _restaurantList
 
       // Create markers for each restaurant by looping through all restaurants

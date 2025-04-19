@@ -51,7 +51,7 @@ Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
   return Padding(
     padding: const EdgeInsets.only(right: 16),
     child: Container(
-      width: isMapScreen ? 380 : 300,
+      width: isMapScreen ? 400 : 300,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: Colors.amber[20],
@@ -105,15 +105,14 @@ Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
 
                 const SizedBox(height: 4),
                 // ✅ Show distance only if this card is used in the map screen
-                isMapScreen && data["distance"] != null
-                  ? Text(
+                Text(
                   '${(data["distance"] as double).toStringAsFixed(0)} meters away',
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.white70,
                   ),
                 )
-                  : const SizedBox.shrink(),
+
               ],
             ),
           ),
