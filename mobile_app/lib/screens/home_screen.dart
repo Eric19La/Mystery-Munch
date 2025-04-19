@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // Body Section
       body: Column(
         children: [
-          // Search Bar
+          // Search Bar Section
           const SizedBox(height: 20),
           Positioned(
             top: 20,
@@ -69,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 20),
 
+          // Category Filter Section
           Expanded(
             child: SingleChildScrollView(
               child: Column(
