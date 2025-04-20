@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 
-// Temp API Key
-const String googlePlacesApiKey = 'AIzaSyDVo8s1pwsKtLGutO4L-yHA1yiMXLnPZ4E';
+// API Key from our .env file
+String googlePlacesApiKey = dotenv.env['GOOGLE_PLACES_API_KEY']!;
 
 // Async Function that returns the current location
 Future<Position> getCurrentLocation() async {
