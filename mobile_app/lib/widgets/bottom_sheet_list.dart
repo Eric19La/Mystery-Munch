@@ -71,12 +71,19 @@ class _BottomSheetListState extends State<BottomSheetList> {
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
                       onPressed: _randomizeRestaurant,
-                      icon: const Text("🎲"),
-                      label: const Text("Randomize"),
+                      icon: const Icon(Icons.shuffle_on_rounded),
+                      label: const Text(
+                        "Randomize",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 10),
             ],
           ),
         );
