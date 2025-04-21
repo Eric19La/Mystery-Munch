@@ -15,7 +15,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mobile_app"
+    namespace = "com.eric.mysterymunch"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -29,7 +29,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mobile_app"
+        applicationId = "com.eric.mysterymunch"
         minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
