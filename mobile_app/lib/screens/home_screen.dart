@@ -61,11 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // Search Bar Section
           const SizedBox(height: 20),
-          Positioned(
-            top: 20,
-            left: 10,
-            right: 10,
-            child: SearchBarWidget()
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: SearchBarWidget(),
           ),
           const SizedBox(height: 20),
 
