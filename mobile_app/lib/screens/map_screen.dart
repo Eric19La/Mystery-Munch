@@ -16,9 +16,9 @@ class _MapScreenState extends State<MapScreen> {
   bool _isLoading = true; // Loading state
 
   late LatLng _currentLocation; // Location of the user
-  Set<Marker> _markers = {};  // List of markers
-  GoogleMapController? _mapController;  // Controller for the map
-  List<Map<String, dynamic>> _restaurantList = [];  // List of restaurants
+  Set<Marker> _markers = {}; // List of markers
+  GoogleMapController? _mapController; // Controller for the map
+  List<Map<String, dynamic>> _restaurantList = []; // List of restaurants
 
   @override
   void initState() {
@@ -29,30 +29,28 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        toolbarHeight: 10,
-      ),
+      appBar: AppBar(elevation: 0, toolbarHeight: 10),
 
       // Body Section
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: _currentLocation,
-              zoom: 13,
-            ),
-            markers: _markers,
-            onMapCreated: (GoogleMapController controller) {
-              _mapController = controller;
-            },
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-          ),
-        ],
-      ),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Stack(
+                children: [
+                  GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: _currentLocation,
+                      zoom: 13,
+                    ),
+                    markers: _markers,
+                    onMapCreated: (GoogleMapController controller) {
+                      _mapController = controller;
+                    },
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: true,
+                  ),
+                ],
+              ),
 
       // Nav Bar Section
       bottomNavigationBar: BottomNavBar(
@@ -70,21 +68,25 @@ class _MapScreenState extends State<MapScreen> {
       _currentLocation = LatLng(position.latitude, position.longitude);
 
       // Fetch nearby restaurants (For testing purposes use 5 we can change this num in the future)
-      final places = await fetchFoodByKeywordList(['food'], limit: 8);
-      _restaurantList = places; // Save the fetched restaurants in _restaurantList
+      final places = await fetchFoodByKeywordList(['food'], limit: 1);
+      _restaurantList =
+          places; // Save the fetched restaurants in _restaurantList
 
       // Create markers for each restaurant by looping through all restaurants
-      Set<Marker> newMarkers = places.map((place) {
-        return Marker(
-          markerId: MarkerId(place['title']),
-          position: LatLng(place['lat'], place['lng']),
-          infoWindow: InfoWindow(title: place['title']),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
-          onTap: () {
-            _showBottomSheet(context, place);
-          },
-        );
-      }).toSet();
+      Set<Marker> newMarkers =
+          places.map((place) {
+            return Marker(
+              markerId: MarkerId(place['title']),
+              position: LatLng(place['lat'], place['lng']),
+              infoWindow: InfoWindow(title: place['title']),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueOrange,
+              ),
+              onTap: () {
+                _showBottomSheet(context, place);
+              },
+            );
+          }).toSet();
 
       setState(() {
         _markers = newMarkers;
@@ -97,12 +99,17 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   // Function that takes the selected restaurant and builds the bottom sheet when a marker is tapped
-  void _showBottomSheet(BuildContext context, Map<String, dynamic> selectedRestaurant) {
+  void _showBottomSheet(
+    BuildContext context,
+    Map<String, dynamic> selectedRestaurant,
+  ) {
     // Reorder the list to put the selected restaurant at the top
     final reorderedRestaurants = [
       selectedRestaurant,
       ..._restaurantList.where(
-        (r) => r['title'] != selectedRestaurant['title'], // We don't want to include the selected restaurant in the list
+        (r) =>
+            r['title'] !=
+            selectedRestaurant['title'], // We don't want to include the selected restaurant in the list
       ),
     ];
 
@@ -114,9 +121,11 @@ class _MapScreenState extends State<MapScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return BottomSheetList(restaurant: reorderedRestaurants, scrollController: ScrollController());
+        return BottomSheetList(
+          restaurant: reorderedRestaurants,
+          scrollController: ScrollController(),
+        );
       },
     );
   }
-
 } // end MapScreenState

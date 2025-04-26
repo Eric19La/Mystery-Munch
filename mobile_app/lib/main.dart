@@ -1,29 +1,27 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+import 'controllers/filter_controller.dart';
 import 'screens/home_screen.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await dotenv.load();
-
+void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Mystery Munch',
-      theme: ThemeData(
-        colorSchemeSeed: Colors.amber[50],
+    return ChangeNotifierProvider(
+      create: (context) => FilterController(),
+      child: MaterialApp(
+        title: 'Mystery Munch',
+        theme: ThemeData(
+          primarySwatch: Colors.amber,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: const HomeScreen(),
       ),
-      debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
     );
   }
 }

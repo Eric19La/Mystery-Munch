@@ -34,8 +34,11 @@ Future<Position> getCurrentLocation() async {
 }
 
 // Async Function that returns a list of restaurants with the title, description, and image
-Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords, {int limit = 5}) async {
-  final position = await getCurrentLocation();  // Get the current location
+Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(
+  List<String> keywords, {
+  int limit = 1,
+}) async {
+  final position = await getCurrentLocation(); // Get the current location
 
   // Extract the latitude and longitude
   final latitude = position.latitude;
@@ -65,37 +68,43 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords,
       // print("✅ API Response: ${results.length} results for '$keyword'");
 
       // Loop through the results and extract the name, description, location, and image URL
-      final filtered = results.take(limit).map<Map<String, dynamic>>((place) {
-        // User Location
-        final lat = place['geometry']?['location']?['lat']; // Pulls latitude/longitude from the result
-        final lng = place['geometry']?['location']?['lng'];
+      final filtered =
+          results.take(limit).map<Map<String, dynamic>>((place) {
+            // User Location
+            final lat =
+                place['geometry']?['location']?['lat']; // Pulls latitude/longitude from the result
+            final lng = place['geometry']?['location']?['lng'];
 
-        // Calculates distance from your current location to the restaurant
-        final distanceInMeters = Geolocator.distanceBetween(
-          latitude, longitude, lat ?? 0, lng ?? 0,
-        );
+            // Calculates distance from your current location to the restaurant
+            final distanceInMeters = Geolocator.distanceBetween(
+              latitude,
+              longitude,
+              lat ?? 0,
+              lng ?? 0,
+            );
 
-        // Image Logic
-        String imageUrl = 'https://via.placeholder.com/400'; // If the photo has an image, use it, otherwise use a placeholder
+            // Image Logic
+            String imageUrl =
+                'https://via.placeholder.com/400'; // If the photo has an image, use it, otherwise use a placeholder
 
-        if (place['photos'] != null && place['photos'].isNotEmpty) {
-          final photoRef = place['photos'][0]['photo_reference'];
-          imageUrl =
-          'https://maps.googleapis.com/maps/api/place/photo'
-              '?maxwidth=400'
-              '&photoreference=$photoRef'
-              '&key=$googlePlacesApiKey';
-        }
+            if (place['photos'] != null && place['photos'].isNotEmpty) {
+              final photoRef = place['photos'][0]['photo_reference'];
+              imageUrl =
+                  'https://maps.googleapis.com/maps/api/place/photo'
+                  '?maxwidth=400'
+                  '&photoreference=$photoRef'
+                  '&key=$googlePlacesApiKey';
+            }
 
-        // Return the restaurant data
-        return {
-          'title': place['name'] ?? 'No name',
-          'image': imageUrl,
-          'lat': lat,
-          'lng': lng,
-          'distance': distanceInMeters,
-        };
-      }).toList();
+            // Return the restaurant data
+            return {
+              'title': place['name'] ?? 'No name',
+              'image': imageUrl,
+              'lat': lat,
+              'lng': lng,
+              'distance': distanceInMeters,
+            };
+          }).toList();
 
       // Add the filtered results to the allResults list
       allResults.addAll(filtered);
