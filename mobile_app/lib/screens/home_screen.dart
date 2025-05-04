@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:mobile_app/controllers/nav_controller.dart';
-import 'package:mobile_app/controllers/filter_controller.dart';
-import 'package:mobile_app/widgets/bottom_navbar.dart';
+import '../controllers/nav_controller.dart';
+import '../controllers/filter_provider.dart';
+import '../widgets/bottom_navbar.dart';
 import '../api/places_api.dart';
 import '../widgets/category_icon.dart';
 import '../widgets/search_bar.dart';
 import '../widgets/category_section.dart';
+import '../widgets/category_constants.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,61 +18,27 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Map<String, dynamic>> nearbyRestaurants =
-      []; // List of nearby restaurants
-  Map<String, List<Map<String, dynamic>>> filteredSections =
-      {}; // Map of filtered sections
+  List<Map<String, dynamic>> nearbyRestaurants = [];  // List of nearby restaurants
+  Map<String, List<Map<String, dynamic>>> filteredSections = {};  // Map of filtered sections
   bool isLoadingNearby = false; // Loading state for nearby restaurants
-  bool isLoadingFilters = false; // Loading state for filtered sections
+  bool isLoadingFilters = false;  // Loading state for filtered sections
 
   @override
   void initState() {
     super.initState();
-    fetchNearbyFood(); // Fetch nearby restaurants on initialization
-    fetchAndUpdateRestaurants(); // Fetch and update filtered sections on initialization
-  }
+    fetchNearbyFood();  // Fetch nearby restaurants on initialization
 
-  // List of categories the user is able to select
-  final categories = [
-    {"icon": Icons.restaurant_menu, "label": "Grub", "value": "restaurants"},
-    {"icon": Icons.fastfood, "label": "Fast Food", "value": "fast food"},
-    {"icon": Icons.cake, "label": "Desserts", "value": "desserts"},
-    {"icon": Icons.coffee, "label": "Coffee", "value": "coffee"},
-    {"icon": Icons.circle_outlined, "label": "Boba", "value": "milk tea"},
-    {"icon": Icons.soup_kitchen, "label": "Soup", "value": "soup"},
-    {"icon": Icons.local_pizza, "label": "Pizza", "value": "pizza"},
-    {
-      "icon": Icons.egg_rounded,
-      "label": "Breakfast",
-      "value": "breakfast food",
-    },
-    {
-      "icon": Icons.rice_bowl_sharp,
-      "label": "Chinese",
-      "value": "chinese food",
-    },
-    {
-      "icon": Icons.ramen_dining_sharp,
-      "label": "Japanese",
-      "value": "japanese food",
-    },
-    {
-      "icon": Icons.local_fire_department_sharp,
-      "label": "Mexican",
-      "value": "mexican food",
-    },
-    {
-      "icon": Icons.room_service_sharp,
-      "label": "Italian",
-      "value": "italian food",
-    },
-    {"icon": Icons.liquor_sharp, "label": "Drinks", "value": "drinks"},
-    {"icon": Icons.forest_sharp, "label": "Healthy", "value": "salad"},
-    // {"icon": Icons.filter_list_alt, "label": "Filter"},
-  ];
+    // Call after build so context is available
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchAndUpdateRestaurants(context); // Fetch and update filtered sections on initialization
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final filterProvider = Provider.of<FilterProvider>(context);
+    final selectedFilters = filterProvider.selectedFilters;
+
     return Scaffold(
       // Header Section
       appBar: AppBar(elevation: 0, toolbarHeight: 10),
@@ -95,37 +62,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const SizedBox(height: 20),
 
-                  // Category Scrollable Icons
+                  // Category Filters
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
-                      children:
-                          categories.map((category) {
-                            final label =
-                                category['label'] as String? ??
-                                'No label'; // Get the label of the category
-                            final value =
-                                category['value'] as String? ??
-                                'No value'; // Get the value of the category used for API calls
-                            final filterController =
-                                Provider.of<FilterController>(context);
-                            final isSelected = filterController.selectedFilters
-                                .contains(
-                                  value.toLowerCase(),
-                                ); // Check if the category is selected
+                      children: kFoodCategories.map((category) {
+                        final label = category['label'] as String;  // Get the label of the category
+                        final value = category['value'] as String;  // Get the value of the category used for API calls
+                        final isSelected = selectedFilters.contains(value.toLowerCase()); // Check if the category is selected
 
-                            // Build the category icon
-                            return CategoryIcon(
-                              category['icon'] as IconData,
-                              label,
-                              selected: isSelected,
-                              onTap: () {
-                                filterController.toggleFilter(value);
-                                fetchAndUpdateRestaurants();
-                              },
-                            );
-                          }).toList(),
+                        // Build the category icon
+                        return CategoryIcon(
+                          category['icon'] as IconData,
+                          label,
+                          selected: isSelected,
+                          onTap: () {
+                            filterProvider.toggleFilter(value);
+                            fetchAndUpdateRestaurants(context);
+                          },
+                        );
+                      }).toList(),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -133,31 +90,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Always show nearby food
                   isLoadingNearby
                       ? const Center(child: CircularProgressIndicator())
-                      : CategorySection(
-                        title: "Food Nearby",
-                        items: nearbyRestaurants,
-                      ),
+                      : CategorySection(title: "Food Nearby", items: nearbyRestaurants),
 
                   const SizedBox(height: 20),
 
                   // Filtered Sections — make sure data exists before showing
-                  Consumer<FilterController>(
-                    builder: (context, filterController, child) {
-                      return Column(
-                        children:
-                            filterController.selectedFilters.map((keyword) {
-                              if (filteredSections.containsKey(keyword) &&
-                                  filteredSections[keyword] != null) {
-                                return CategorySection(
-                                  title: toTitleCase(keyword),
-                                  items: filteredSections[keyword]!,
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            }).toList(),
-                      );
-                    },
-                  ),
+                  for (String keyword in selectedFilters)
+                    if (filteredSections.containsKey(keyword))
+                      CategorySection(
+                        title: toTitleCase(keyword),
+                        items: filteredSections[keyword]!,
+                      ),
                 ],
               ),
             ),
@@ -188,19 +131,15 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Function update filtered sections
-  void fetchAndUpdateRestaurants() async {
+  void fetchAndUpdateRestaurants(BuildContext context) async {
     setState(() => isLoadingFilters = true);
 
-    final filterController = Provider.of<FilterController>(
-      context,
-      listen: false,
-    );
+    final selectedFilters = Provider.of<FilterProvider>(context, listen: false).selectedFilters;
 
     // Loops through the selected filters and fetches the results
-    for (String keyword in List.from(filterController.selectedFilters)) {
-      final key =
-          keyword
-              .toLowerCase(); // Makes sure the keyword matches with one of the categories above
+    for (String keyword in List.from(selectedFilters)) {
+      // Makes sure the keyword matches with one of the categories above
+      final key = keyword.toLowerCase();
 
       // Prevent duplicate fetches
       if (filteredSections.containsKey(key)) continue;
@@ -224,12 +163,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Help function that converts a string to title case
   String toTitleCase(String text) {
-    return text
-        .split(' ')
-        .map((word) {
-          if (word.isEmpty) return word;
-          return word[0].toUpperCase() + word.substring(1).toLowerCase();
-        })
-        .join(' ');
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
   }
 } // end HomeScreenState
