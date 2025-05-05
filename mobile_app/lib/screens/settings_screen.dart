@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/controllers/nav_controller.dart';
+import 'package:mobile_app/screens/bookmarks_screen.dart';
 import 'package:mobile_app/screens/sign_in_screen.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -81,10 +82,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             leading: Icon(Icons.bookmark),
             title: Text("Saved Restaurants"),
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SignInScreen()), // Ensure it's properly structured
-              );
+              // Check if the user is signed in
+              final userSignIn = FirebaseAuth.instance.currentUser;
+
+              if (userSignIn == null) {
+                // Not signed in — redirect to sign-in screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignInScreen()),
+                );
+              } else {
+                // Signed in — go to the (future) bookmarks page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BookmarksScreen()), // Create this later
+                );
+              }
             },
           ),
           Divider(),
