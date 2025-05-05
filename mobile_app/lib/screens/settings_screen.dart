@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
+  // Create an instance of the SettingsScreen
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
