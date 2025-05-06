@@ -34,7 +34,7 @@ Future<Position> getCurrentLocation() async {
 }
 
 // Async Function that returns a list of restaurants with the title, description, and image
-Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords, {int limit = 0,}) async {
+Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords, {int limit = 1,}) async {
   final position = await getCurrentLocation(); // Get the current location
 
   // Extract the latitude and longitude
