@@ -48,33 +48,53 @@ class _BottomSheetListState extends State<BottomSheetList> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
 
               // Category filter row
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
-                  children: kFoodCategories.map((category) {
-                    final label = category['label'] as String;
-                    final value = category['value'] as String;
-                    final isSelected = selectedFilters.contains(value.toLowerCase());
+                  children: [
+                    // Show Clear button only if filters are active
+                    if (selectedFilters.isNotEmpty)
+                      CategoryIcon(
+                        kClearCategory['icon'] as IconData,
+                        kClearCategory['label'] as String,
+                        selected: false,
+                        onTap: () {
+                          filterProvider.clearFilters();
+                          Navigator.pop(context); // close the bottom sheet
+                          if (widget.onFilterChange != null) {
+                            widget.onFilterChange!(); // refresh the map
+                          }
+                        },
+                      ),
 
-                    return CategoryIcon(
-                      category['icon'] as IconData,
-                      label,
-                      selected: isSelected,
-                      onTap: () {
-                        filterProvider.toggleFilter(value);
-                        Navigator.pop(context); // re-trigger fetch on map
+                    // Show the rest of the filter categories
+                    ...kFoodCategories
+                        .where((c) => c['value'] != 'clear_filters') // exclude 'Clear' from main list
+                        .map((category) {
+                      final label = category['label'] as String;
+                      final value = category['value'] as String;
+                      final isSelected = selectedFilters.contains(value.toLowerCase());
 
-                        // Let map screen know to refresh markers
-                        if (widget.onFilterChange != null) {
-                          widget.onFilterChange!();
-                        }
-                      },
-                    );
-                  }).toList(),
+                      return CategoryIcon(
+                        category['icon'] as IconData,
+                        label,
+                        selected: isSelected,
+                        onTap: () {
+                          filterProvider.toggleFilter(value);
+                          Navigator.pop(context); // close sheet
+
+                          // Let map screen to know that filters have changed to refresh the markers
+                          if (widget.onFilterChange != null) {
+                            widget.onFilterChange!(); // refresh map
+                          }
+                        },
+                      );
+                    }).toList(),
+                  ],
                 ),
               ),
               const SizedBox(height: 15),
@@ -93,7 +113,7 @@ class _BottomSheetListState extends State<BottomSheetList> {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 5),
 
               // Randomize button
               Padding(
