@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+// List of categories for the filter
 const List<Map<String, dynamic>> kFoodCategories = [
+  kClearCategory, // Clear button used dynamically
   {"icon": Icons.restaurant_menu, "label": "Grub", "value": "restaurants"},
   {"icon": Icons.fastfood, "label": "Fast Food", "value": "fast food"},
   {"icon": Icons.cake, "label": "Desserts", "value": "desserts"},
@@ -16,3 +18,10 @@ const List<Map<String, dynamic>> kFoodCategories = [
   {"icon": Icons.liquor_sharp, "label": "Drinks", "value": "drinks"},
   {"icon": Icons.forest_sharp, "label": "Healthy", "value": "salad"},
 ];
+
+const Map<String, dynamic> kClearCategory = {
+  "icon": Icons.clear_all_rounded,
+  "label": "Clear",
+  "value": "clear_filters", // special action keyword
+  "isClear": true,
+};

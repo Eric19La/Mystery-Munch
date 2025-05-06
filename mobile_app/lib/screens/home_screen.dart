@@ -67,22 +67,41 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
-                      children: kFoodCategories.map((category) {
-                        final label = category['label'] as String;  // Get the label of the category
-                        final value = category['value'] as String;  // Get the value of the category used for API calls
-                        final isSelected = selectedFilters.contains(value.toLowerCase()); // Check if the category is selected
+                      children: [
+                        // Only show the clear icon if filters are selected
+                        if (selectedFilters.isNotEmpty)
+                          CategoryIcon(
+                            kClearCategory['icon'] as IconData,
+                            kClearCategory['label'] as String,
+                            selected: false,  // Lets the clear icon be selected
+                            // Clear the filters
+                            onTap: () {
+                              filterProvider.clearFilters();
+                              fetchAndUpdateRestaurants(context);
+                            },
+                          ),
 
-                        // Build the category icon
-                        return CategoryIcon(
-                          category['icon'] as IconData,
-                          label,
-                          selected: isSelected,
-                          onTap: () {
-                            filterProvider.toggleFilter(value);
-                            fetchAndUpdateRestaurants(context);
-                          },
-                        );
-                      }).toList(),
+                        // Build the list of categories
+                        ...kFoodCategories
+                            .where((c) => c['value'] != 'clear_filters') // don't show it twice
+                            .map((category) {
+                          final label = category['label'] as String;
+                          final value = category['value'] as String;
+                          final isSelected = selectedFilters.contains(value.toLowerCase());
+
+                          // Build the category icon
+                          return CategoryIcon(
+                            category['icon'] as IconData,
+                            label,
+                            selected: isSelected,
+                            // Changes the color to dark orange letting the user know it's selected
+                            onTap: () {
+                              filterProvider.toggleFilter(value);
+                              fetchAndUpdateRestaurants(context);
+                            },
+                          );
+                        }).toList(),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 20),
