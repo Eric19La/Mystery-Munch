@@ -6,9 +6,9 @@ import '../widgets/category_icon.dart';
 import 'category_section.dart';
 
 class BottomSheetList extends StatefulWidget {
-  final List<Map<String, dynamic>> restaurant;
-  final ScrollController scrollController;
-  final VoidCallback? onFilterChange;
+  final List<Map<String, dynamic>> restaurant;  // List of restaurants to display
+  final ScrollController scrollController;  // Controller for the scroll view
+  final VoidCallback? onFilterChange; // Callback function to trigger when filters change
 
   const BottomSheetList({
     super.key,
@@ -22,8 +22,9 @@ class BottomSheetList extends StatefulWidget {
 }
 
 class _BottomSheetListState extends State<BottomSheetList> {
-  late List<Map<String, dynamic>> _shuffledRestaurants;
+  late List<Map<String, dynamic>> _shuffledRestaurants; // List of shuffled restaurants
 
+  // Initialize the shuffled restaurants list
   @override
   void initState() {
     super.initState();
@@ -32,6 +33,7 @@ class _BottomSheetListState extends State<BottomSheetList> {
 
   @override
   Widget build(BuildContext context) {
+    // Get the selected filters from the filter provider
     final filterProvider = Provider.of<FilterProvider>(context);
     final selectedFilters = filterProvider.selectedFilters;
 
@@ -77,11 +79,9 @@ class _BottomSheetListState extends State<BottomSheetList> {
               ),
               const SizedBox(height: 15),
 
+              // Displays each restaurant in the list
               const Center(
-                child: Text(
-                  "Nearby Restaurants",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
+                child: Text("Nearby Restaurants", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
               ),
               const SizedBox(height: 10),
 
@@ -95,6 +95,7 @@ class _BottomSheetListState extends State<BottomSheetList> {
               ),
               const SizedBox(height: 20),
 
+              // Randomize button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -117,23 +118,48 @@ class _BottomSheetListState extends State<BottomSheetList> {
     );
   }
 
+  // Function to randomize the restaurant lists
   void _randomizeRestaurant() {
+    // If the list is empty, return without doing anything
     if (_shuffledRestaurants.isEmpty) return;
 
+    // Creates a copy of the list and shuffles it
     final random = _shuffledRestaurants.toList()..shuffle();
+
+    // Grabs the first item in the list
     final randomPick = random.first;
 
-    setState(() {
-      _shuffledRestaurants = [
-        randomPick,
-        ..._shuffledRestaurants.where((r) => r['title'] != randomPick['title']),
-      ];
-    });
+    // Displays a pop-up dialog with the random restaurant
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          insetPadding: const EdgeInsets.all(20),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top row: Title + Close button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Your Mystery Restaurant!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                    IconButton(icon: const Icon(Icons.close_outlined), onPressed: () => Navigator.of(context).pop(),),
+                  ],
+                ),
+                const SizedBox(height: 10),
 
-    widget.scrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
+                // The custom card widget (selected restaurant)
+                buildLargeCategoryCard(randomPick, true),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
-}
+
+} // end BottomSheetList
