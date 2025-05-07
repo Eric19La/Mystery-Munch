@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Content Rating Configuration for Google Play Store -->
+    
+    <!-- Interactive Elements -->
+    <string name="content_rating_interactive_elements">Users can interact with the app to find restaurants and save favorites. No user-generated content or social features.</string>
+    
+    <!-- Content Descriptors -->
+    <string name="content_rating_descriptors">None</string>
+    
+    <!-- Content Rating Summary -->
+    <string name="content_rating_summary">MysteryMunch is a restaurant discovery app that helps users find nearby places to eat. The app does not contain any mature content, violence, or inappropriate material. It is suitable for all ages.</string>
+    
+    <!-- Target Audience -->
+    <string name="content_rating_audience">Everyone</string>
+    
+    <!-- Content Categories -->
+    <string name="content_rating_categories">Food &amp; Drink</string>
+    
+    <!-- Interactive Elements Details -->
+    <string name="content_rating_interactive_details">• Location-based restaurant discovery\n• Restaurant bookmarking\n• Basic user account management\n• No user-generated content\n• No social features\n• No in-app purchases</string>
+    
+    <!-- Privacy Considerations -->
+    <string name="content_rating_privacy">• Location data collection for restaurant discovery\n• Basic user account information\n• No personal data sharing with third parties\n• No targeted advertising</string>
+</resources> 

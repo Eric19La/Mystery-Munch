@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Content Rating Declaration for Google Play Store -->
+    
+    <!-- Interactive Elements -->
+    <string name="declaration_interactive_elements">No</string>
+    
+    <!-- User Generated Content -->
+    <string name="declaration_user_generated_content">No</string>
+    
+    <!-- Gambling -->
+    <string name="declaration_gambling">No</string>
+    
+    <!-- Violence -->
+    <string name="declaration_violence">No</string>
+    
+    <!-- Sexual Content -->
+    <string name="declaration_sexual_content">No</string>
+    
+    <!-- Language -->
+    <string name="declaration_language">No</string>
+    
+    <!-- Controlled Substances -->
+    <string name="declaration_controlled_substances">No</string>
+    
+    <!-- In-App Purchases -->
+    <string name="declaration_in_app_purchases">No</string>
+    
+    <!-- Data Collection -->
+    <string name="declaration_data_collection">Yes</string>
+    <string name="declaration_data_collection_details">Location data for restaurant discovery, basic user account information</string>
+    
+    <!-- Target Audience -->
+    <string name="declaration_target_audience">Everyone</string>
+    
+    <!-- Content Rating -->
+    <string name="declaration_content_rating">Everyone</string>
+</resources> 
