@@ -36,6 +36,7 @@ dependencies:
   http: ^0.13.0 # For making HTTP requests
   uuid: ^4.5.1
   permission_handler: ^11.3.0  # Added for handling permissions
+  shared_preferences: ^2.2.2  # Added for storing privacy policy acceptance
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
