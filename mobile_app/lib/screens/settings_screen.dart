@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/controllers/nav_controller.dart';
 import 'package:mobile_app/screens/bookmarks_screen.dart';
 import 'package:mobile_app/screens/sign_in_screen.dart';
+import 'package:mobile_app/screens/privacy_policy_screen.dart';
 import 'package:mobile_app/widgets/bottom_navbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -14,7 +16,8 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  User? user; // Define the user variable, will store the currently signed-in Firebase user
+  User?
+  user; // Define the user variable, will store the currently signed-in Firebase user
 
   @override
   void initState() {
@@ -49,10 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(width: 12), // Adjust spacing here
             Text(
               _getWelcomeText(),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
           ],
         ),
@@ -71,7 +71,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SignInScreen()), // Ensure it's properly structured
+                MaterialPageRoute(
+                  builder: (context) => SignInScreen(),
+                ), // Ensure it's properly structured
               );
             },
           ),
@@ -95,13 +97,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // Signed in — go to the (future) bookmarks page
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => BookmarksScreen()), // Create this later
+                  MaterialPageRoute(
+                    builder: (context) => BookmarksScreen(),
+                  ), // Create this later
                 );
               }
             },
           ),
           Divider(),
 
+          ListTile(
+            leading: const Icon(Icons.privacy_tip),
+            title: const Text('Privacy Policy'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PrivacyPolicyScreen(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.location_on),
+            title: const Text('Location Settings'),
+            subtitle: const Text('Manage location permissions'),
+            onTap: () async {
+              await openAppSettings();
+            },
+          ),
         ],
       ),
 
@@ -112,7 +136,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-
 } // end SettingsScreen
 
 // Returns a widget for the section header
