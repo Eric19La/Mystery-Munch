@@ -17,7 +17,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   bool _isLoading = true; // Loading state
 
-  late LatLng _currentLocation; // Location of the user
+  LatLng? _currentLocation; // Location of the user
   Set<Marker> _markers = {}; // List of markers
   GoogleMapController? _mapController; // Controller for the map
   List<Map<String, dynamic>> _restaurantList = []; // List of restaurants
@@ -36,22 +36,29 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(elevation: 0, toolbarHeight: 10),
 
       // Body Section
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Stack(
+      body: Stack(
         children: [
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: _currentLocation,
-              zoom: 13,
+          if (!_isLoading && _currentLocation != null)
+            GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: _currentLocation!,
+                zoom: 13,
+              ),
+              markers: _markers,
+              onMapCreated: (controller) => _mapController = controller,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
             ),
-            markers: _markers,
-            onMapCreated: (controller) => _mapController = controller,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
-          ),
+
+          // Overlay a loading indicator
+          if (_isLoading)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
         ],
       ),
+
 
       // Bottom NavBar Section
       bottomNavigationBar: BottomNavBar(
@@ -115,7 +122,11 @@ class _MapScreenState extends State<MapScreen> {
         return BottomSheetList(
           restaurant: reorderedRestaurants,
           scrollController: ScrollController(),
-          onFilterChange: _initializeMap,
+          onFilterChange: () {
+            // Add loading state before calling _initializeMap
+            setState(() => _isLoading = true);
+            _initializeMap(); // Will automatically unset loading when done
+          },
         );
       },
     );
