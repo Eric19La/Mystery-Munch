@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/widgets/restaurant_popup.dart';
+import '../main.dart';
 
 class CategorySection extends StatelessWidget {
   final String title;  // Title of the category
@@ -46,77 +48,77 @@ class CategorySection extends StatelessWidget {
 
 // Create large category cards
 Widget buildLargeCategoryCard(Map<String, dynamic> data, bool isMapScreen) {
-  final imageUrl = data["image"] ?? 'https://via.placeholder.com/400';
+  final imageUrl = data["image"] ?? 'https://via.placeholder.com/400';  // Placeholder image if no image is provided
+  final title = data["title"] ?? 'Unnamed'; // Default title if no title is provided
+  final distance = data["distance"] ?? 0; // Default distance if no distance is provided
 
-  return Padding(
-    padding: const EdgeInsets.only(right: 16),
-    child: Container(
-      width: isMapScreen ? 400 : 300,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.amber[20],
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 5),
-        ],
-      ),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(
-              imageUrl,
-              height: 240,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[300],
-                child: const Center(child: Icon(Icons.broken_image, size: 40)),
-              ),
-            ),
-          ),
-          Container(
-            height: 240,
-            decoration: BoxDecoration(
+  return GestureDetector(
+    // When the restaurant is tapped, show the restaurant popup
+    onTap: () {
+      showDialog(
+        context: navigatorKey.currentContext!, // <- Add this key to your MaterialApp (see below)
+        builder: (context) => RestaurantPopup(
+          title: data['title'],
+          imageUrl: data['image'],
+          distance: data['distance'],
+          rating: data['rating'],
+          lat: data['lat'],
+          lng: data['lng'],
+        ),
+      );
+    },
+
+    // The Default Image Card you see on the home/map screen
+    child: Padding(
+      padding: const EdgeInsets.only(right: 16),
+      child: Container(
+        width: isMapScreen ? 400 : 300,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.amber[20],
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5)],
+        ),
+        child: Stack(
+          children: [
+            ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: [Colors.black.withOpacity(0.7), Colors.transparent],
+              child: Image.network(
+                imageUrl,
+                height: 240,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Container(color: Colors.grey[300], child: Icon(Icons.broken_image)),
               ),
             ),
-          ),
-
-          // Title Section of the Restaurant
-          Positioned(
-            bottom: 20,
-            left: 16,
-            right: 16,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  data["title"] ?? 'Unnamed',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+            Container(
+              height: 240,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [Colors.black.withOpacity(0.7), Colors.transparent],
                 ),
-
-                const SizedBox(height: 4),
-                // ✅ Show distance only if this card is used in the map screen
-                Text(
-                  '${(data["distance"] as double).toStringAsFixed(0)} meters away',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                )
-
-              ],
+              ),
             ),
-          ),
-        ],
+
+            // Title + Distance Section of the Image Card
+            Positioned(
+              bottom: 20,
+              left: 16,
+              right: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                  SizedBox(height: 4),
+                  Text('${distance.toStringAsFixed(0)} meters away', style: TextStyle(color: Colors.white70)),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     ),
   );

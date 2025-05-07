@@ -5,11 +5,16 @@ import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'controllers/filter_provider.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await dotenv.load();
+// Global key for the navigator
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+// Main function to run the app
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();  // Ensure Flutter is initialized
+  await Firebase.initializeApp(); // Initialize Firebase
+  await dotenv.load();  // Load environment variables from .env file
+
+  // Run the app with the filter provider
   runApp(
     ChangeNotifierProvider(
       create: (_) => FilterProvider(),
@@ -18,12 +23,14 @@ Future<void> main() async {
   );
 }
 
+// Main app widget
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Mystery Munch',
       theme: ThemeData(
         colorSchemeSeed: Colors.amber[50],
