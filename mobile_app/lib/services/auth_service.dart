@@ -1,33 +1,39 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
+class AuthResult {
+  final User? user;
+  final String? error;
+  AuthResult({this.user, this.error});
+}
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Sign in with email & password
-  Future<User?> signIn(String email, String password) async {
+  Future<AuthResult> signIn(String email, String password) async {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return userCredential.user;
+      return AuthResult(user: userCredential.user);
+    } on FirebaseAuthException catch (e) {
+      return AuthResult(error: _getMessageFromCode(e.code));
     } catch (e) {
-      print("Sign-in error: $e");
-      return null;
+      return AuthResult(error: 'An unknown error occurred.');
     }
   }
 
   // Sign up with email & password
-  Future<User?> signUp(String email, String password) async {
+  Future<AuthResult> signUp(String email, String password) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return userCredential.user;
+      UserCredential userCredential = await _auth
+          .createUserWithEmailAndPassword(email: email, password: password);
+      return AuthResult(user: userCredential.user);
+    } on FirebaseAuthException catch (e) {
+      return AuthResult(error: _getMessageFromCode(e.code));
     } catch (e) {
-      print("Sign-up error: $e");
-      return null;
+      return AuthResult(error: 'An unknown error occurred.');
     }
   }
 
@@ -39,5 +45,26 @@ class AuthService {
   // Get current user
   User? getCurrentUser() {
     return _auth.currentUser;
+  }
+
+  String _getMessageFromCode(String code) {
+    switch (code) {
+      case 'invalid-email':
+        return 'The email address is not valid.';
+      case 'user-disabled':
+        return 'This user has been disabled.';
+      case 'user-not-found':
+        return 'No user found for that email.';
+      case 'wrong-password':
+        return 'Incorrect password.';
+      case 'email-already-in-use':
+        return 'The email is already in use.';
+      case 'weak-password':
+        return 'The password is too weak.';
+      case 'operation-not-allowed':
+        return 'Operation not allowed.';
+      default:
+        return 'Authentication error: $code';
+    }
   }
 }

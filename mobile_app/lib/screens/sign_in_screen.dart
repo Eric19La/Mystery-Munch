@@ -32,52 +32,57 @@ class _SignInScreenState extends State<SignInScreen> {
     // Shows a popup with a title and message for the user
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text("OK"),
+      builder:
+          (context) => AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("OK"),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   // Functions for signing in
   void _signIn() async {
-    // Uses the AuthService to sign in the user
-    User? user = await _authService.signIn(
-      // .trim() removes any leading or trailing whitespace
+    final result = await _authService.signIn(
       emailController.text.trim(),
       passwordController.text.trim(),
     );
 
-    if (user != null) {
+    if (result.user != null) {
       setState(() {
-        _currentUser = user;
+        _currentUser = result.user;
       });
-      _showAlert("Signed In", "Welcome back, ${user.email}!");
+      _showAlert("Signed In", "Welcome back, ${result.user!.email}!");
     } else {
-      _showAlert("Sign In Failed", "Invalid credentials. Try again.");
+      _showAlert(
+        "Sign In Failed",
+        result.error ?? "Invalid credentials. Try again.",
+      );
     }
   }
 
   // Functions for signing up (Similar to signing in)
   void _signUp() async {
-    User? user = await _authService.signUp(
+    final result = await _authService.signUp(
       emailController.text.trim(),
       passwordController.text.trim(),
     );
 
-    if (user != null) {
+    if (result.user != null) {
       setState(() {
-        _currentUser = user;
+        _currentUser = result.user;
       });
-      _showAlert("Account Created", "Welcome, ${user.email}!");
+      _showAlert("Account Created", "Welcome, ${result.user!.email}!");
     } else {
-      _showAlert("Sign Up Failed", "Something went wrong. Try again.");
+      _showAlert(
+        "Sign Up Failed",
+        result.error ?? "Something went wrong. Try again.",
+      );
     }
   }
 
@@ -113,21 +118,16 @@ class _SignInScreenState extends State<SignInScreen> {
           controller: passwordController,
           decoration: InputDecoration(
             labelText: "Password",
-            helperText: "Example: seeyuh\n*Password has to be at least 6 characters",
+            helperText:
+                "Example: seeyuh\n*Password has to be at least 6 characters",
           ),
           obscureText: true,
         ),
 
         // Sign in/up buttons
         SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: _signIn,
-          child: Text("Sign In"),
-        ),
-        ElevatedButton(
-          onPressed: _signUp,
-          child: Text("Sign Up"),
-        ),
+        ElevatedButton(onPressed: _signIn, child: Text("Sign In")),
+        ElevatedButton(onPressed: _signUp, child: Text("Sign Up")),
       ],
     );
   }
@@ -135,10 +135,7 @@ class _SignInScreenState extends State<SignInScreen> {
   // UI for the logout screen
   Widget _buildLogoutUI() {
     return Center(
-      child: ElevatedButton(
-        onPressed: _signOut,
-        child: Text("Log Out"),
-      ),
+      child: ElevatedButton(onPressed: _signOut, child: Text("Log Out")),
     );
   }
 
@@ -157,5 +154,4 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     );
   }
-
 } // end _SignInScreenState
