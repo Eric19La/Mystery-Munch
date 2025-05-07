@@ -35,4 +35,22 @@ class CategoryIcon extends StatelessWidget {
       ),
     );
   }
+} // end Category Icon Class
+
+// Reusable compact icon widget (like a mini clear button)
+Widget buildCompactCategoryIcon({
+  required IconData icon,
+  required VoidCallback onTap,
+  double radius = 20,
+  double iconSize = 20,
+  Color backgroundColor = Colors.orange,
+}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: CircleAvatar(
+      backgroundColor: backgroundColor,
+      radius: radius,
+      child: Icon(icon, size: iconSize, color: Colors.white),
+    ),
+  );
 }

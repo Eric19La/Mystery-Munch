@@ -22,6 +22,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, List<Map<String, dynamic>>> filteredSections = {};  // Map of filtered sections
   bool isLoadingNearby = false; // Loading state for nearby restaurants
   bool isLoadingFilters = false;  // Loading state for filtered sections
+  String? searchQuery;  // Search query
+  final TextEditingController _searchController = TextEditingController();  // Controller for the search bar
 
   @override
   void initState() {
@@ -50,7 +52,19 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: SearchBarWidget(),
+            child: SearchBarWidget(
+              controller: _searchController,
+              onSearch: (query) => fetchTextSearchResults(query), // Search for text
+              showClearIcon: searchQuery != null, // Show clear icon if search is active
+              onClear: () {
+                setState(() {
+                  searchQuery = null; // Clear the search query
+                  _searchController.clear();  // Clear the text field
+                  nearbyRestaurants = []; // Clear the nearby restaurants
+                  fetchNearbyFood();  // Fetch nearby restaurants again
+                });
+              },
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -109,7 +123,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Always show nearby food
                   isLoadingNearby
                       ? const Center(child: CircularProgressIndicator())
-                      : CategorySection(title: "Food Nearby", items: nearbyRestaurants),
+                      : CategorySection(
+                          title: searchQuery != null ? 'Search results for: ${toTitleCase(searchQuery!)}' : "Food Nearby",
+                          items: nearbyRestaurants,
+                        ),
 
                   const SizedBox(height: 20),
 
@@ -185,6 +202,36 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Set loading state to false
     setState(() => isLoadingFilters = false);
+  }
+
+  // Function to handle navigation on searches
+  void fetchTextSearchResults(String query) async {
+    // Set loading state to true
+    setState(() {
+      isLoadingNearby = true;
+      searchQuery = query;
+    });
+
+    // Fetch the results for the query
+    try {
+      final results = await fetchPlacesByTextSearch(query); // Fetch the results using Google Places API
+      setState(() {
+        nearbyRestaurants = results;
+      });
+
+      // Show a snackbar if no results are found
+      if (results.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No places found for that search.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      setState(() => isLoadingNearby = false);
+    }
   }
 
   // Help function that converts a string to title case

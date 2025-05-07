@@ -34,7 +34,7 @@ Future<Position> getCurrentLocation() async {
 }
 
 // Async Function that returns a list of restaurants with the title, description, and image
-Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords, {int limit = 5,}) async {
+Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords, {int limit = 5}) async {
   final position = await getCurrentLocation(); // Get the current location
 
   // Extract the latitude and longitude
@@ -66,42 +66,41 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords,
 
       // Loop through the results and extract the name, description, location, and image URL
       final filtered =
-          results.take(limit).map<Map<String, dynamic>>((place) {
-            // User Location
-            final lat =
-                place['geometry']?['location']?['lat']; // Pulls latitude/longitude from the result
-            final lng = place['geometry']?['location']?['lng'];
+        results.take(limit).map<Map<String, dynamic>>((place) {
+          // User Location
+          final lat = place['geometry']?['location']?['lat']; // Pulls latitude/longitude from the result
+          final lng = place['geometry']?['location']?['lng'];
 
-            // Calculates distance from your current location to the restaurant
-            final distanceInMeters = Geolocator.distanceBetween(
-              latitude,
-              longitude,
-              lat ?? 0,
-              lng ?? 0,
-            );
+          // Calculates distance from your current location to the restaurant
+          final distanceInMeters = Geolocator.distanceBetween(
+            latitude,
+            longitude,
+            lat ?? 0,
+            lng ?? 0,
+          );
 
-            // Image Logic
-            String imageUrl =
-                'https://via.placeholder.com/400'; // If the photo has an image, use it, otherwise use a placeholder
+          // Image Logic
+          String imageUrl =
+              'https://via.placeholder.com/400'; // If the photo has an image, use it, otherwise use a placeholder
 
-            if (place['photos'] != null && place['photos'].isNotEmpty) {
-              final photoRef = place['photos'][0]['photo_reference'];
-              imageUrl =
-                  'https://maps.googleapis.com/maps/api/place/photo'
-                  '?maxwidth=400'
-                  '&photoreference=$photoRef'
-                  '&key=$googlePlacesApiKey';
-            }
+          if (place['photos'] != null && place['photos'].isNotEmpty) {
+            final photoRef = place['photos'][0]['photo_reference'];
+            imageUrl =
+                'https://maps.googleapis.com/maps/api/place/photo'
+                '?maxwidth=400'
+                '&photoreference=$photoRef'
+                '&key=$googlePlacesApiKey';
+          }
 
-            // Return the restaurant data
-            return {
-              'title': place['name'] ?? 'No name',
-              'image': imageUrl,
-              'lat': lat,
-              'lng': lng,
-              'distance': distanceInMeters,
-            };
-          }).toList();
+          // Return the restaurant data
+          return {
+            'title': place['name'] ?? 'No name',
+            'image': imageUrl,
+            'lat': lat,
+            'lng': lng,
+            'distance': distanceInMeters,
+          };
+        }).toList();
 
       // Add the filtered results to the allResults list
       allResults.addAll(filtered);
@@ -113,4 +112,90 @@ Future<List<Map<String, dynamic>>> fetchFoodByKeywordList(List<String> keywords,
 
   // Return the final list of all results
   return allResults;
+}
+
+// Async Function that returns a list of restaurants with the title, description, and image used for Searching
+Future<List<Map<String, dynamic>>> fetchPlacesByTextSearch(String query, {int limit = 3}) async {
+  final position = await getCurrentLocation(); // for distance calculation
+
+  // Extract the latitude and longitude
+  final latitude = position.latitude;
+  final longitude = position.longitude;
+
+  // Builds a URL to query the Google Places API through the search results (query)
+  final url = Uri.parse(
+    'https://maps.googleapis.com/maps/api/place/textsearch/json'
+        '?query=${Uri.encodeComponent(query)}'
+        '&type=restaurant'
+        '&radius=3000'
+        '&key=$googlePlacesApiKey',
+  );
+
+  // Sends a GET request to the URL and waits for the response
+  final response = await http.get(url);
+
+  // Check the response status
+  if (response.statusCode != 200) {
+    throw Exception('❌ Network error: ${response.statusCode}');
+  }
+
+  final data = jsonDecode(response.body); // Decode the JSON response
+  final status = data['status'];  // Get the status from the response
+
+  // Handle different status codes
+  switch (status) {
+    case 'OK':
+      final List results = data['results']; // Pulls the results from the response
+
+      // Loop through the results and extract the name, description, location, and image
+      return results.take(limit).map<Map<String, dynamic>>((place) {
+        final lat = place['geometry']?['location']?['lat'];
+        final lng = place['geometry']?['location']?['lng'];
+
+        // Distance calc if lat/lng exists
+        final distanceInMeters = (lat != null && lng != null)
+            ? Geolocator.distanceBetween(latitude, longitude, lat, lng)
+            : 999999.0;
+
+        // Image logic
+        String imageUrl = 'https://via.placeholder.com/400';
+        if (place['photos'] != null && place['photos'].isNotEmpty) {
+          final photoRef = place['photos'][0]['photo_reference'];
+          imageUrl =
+          'https://maps.googleapis.com/maps/api/place/photo'
+              '?maxwidth=400'
+              '&photoreference=$photoRef'
+              '&key=$googlePlacesApiKey';
+        }
+
+        // Return the restaurant data
+        return {
+          'title': place['name'] ?? 'No name',
+          'address': place['formatted_address'] ?? 'No address',
+          'lat': lat ?? 0.0,
+          'lng': lng ?? 0.0,
+          'rating': (place['rating'] ?? 0).toDouble(),
+          'image': imageUrl,
+          'distance': distanceInMeters,
+          'placeId': place['place_id'] ?? '',
+        };
+      }).toList();
+
+    // Return an empty list if no results are found
+    case 'ZERO_RESULTS':
+      return [];
+
+    // Throw exceptions for other status codes
+    case 'OVER_QUERY_LIMIT':
+      throw Exception('🚫 You’ve exceeded your quota for the Places API.');
+
+    case 'REQUEST_DENIED':
+      throw Exception('🔒 API request was denied. Check your API key and permissions.');
+
+    case 'INVALID_REQUEST':
+      throw Exception('⚠️ Invalid request. Make sure your query string is valid.');
+
+    default:
+      throw Exception('❓ Unknown error from Places API: $status');
+  }
 }
