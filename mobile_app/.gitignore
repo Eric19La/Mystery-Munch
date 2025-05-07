@@ -46,3 +46,6 @@ app.*.map.json
 
 # Environment Variables
 .env
+
+# Secrets
+android/app/src/main/res/values/secrets.xml
