@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/widgets/restaurant_popup.dart';
 import 'package:provider/provider.dart';
 import '../controllers/filter_provider.dart';
 import '../widgets/category_constants.dart';
@@ -154,38 +155,18 @@ class _BottomSheetListState extends State<BottomSheetList> {
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          insetPadding: const EdgeInsets.all(20),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Top row: Title + Close button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Your Mystery Restaurant!',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
-                    ),
-                    buildCompactCategoryIcon(
-                      icon: Icons.close_outlined,
-                      onTap: () => Navigator.pop(context)
-                    )
-                  ],
-                ),
-                const SizedBox(height: 10),
-
-                // The custom card widget (selected restaurant)
-                buildLargeCategoryCard(randomPick, true),
-              ],
-            ),
-          ),
+        return RestaurantPopup(
+          title: randomPick['title'],
+          imageUrl: randomPick['image'],
+          distance: randomPick['distance'],
+          rating: randomPick['rating'], // nullable is okay
+          lat: randomPick['lat'],
+          lng: randomPick['lng'],
+          showSubtitle: true,
         );
       },
     );
+
   }
 
 } // end BottomSheetList

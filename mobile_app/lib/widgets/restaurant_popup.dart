@@ -7,6 +7,7 @@ class RestaurantPopup extends StatelessWidget {
   final String imageUrl;  // Image of the restaurant
   final double distance;  // Distance from the user
   final double? rating; // Rating of the restaurant
+  final bool showSubtitle; // For the BottomSheetList
 
   // Location of the restaurant
   final double lat; // Latitude of the restaurant
@@ -20,6 +21,7 @@ class RestaurantPopup extends StatelessWidget {
     this.rating,
     required this.lat,
     required this.lng,
+    this.showSubtitle = false, // default is false
   });
 
   // Open Google Maps with the restaurant's location
@@ -40,6 +42,19 @@ class RestaurantPopup extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // For the Randomize Feature on the MapScreen
+            if (showSubtitle) ...[
+              const Text(
+                'Your Mystery Restaurant!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 15),
+            ],
+
             // Top: Title + Close
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -50,7 +65,7 @@ class RestaurantPopup extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: Colors.black54,
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,

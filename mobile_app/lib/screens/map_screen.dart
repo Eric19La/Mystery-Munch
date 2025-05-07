@@ -78,7 +78,7 @@ class _MapScreenState extends State<MapScreen> {
       final filters = Provider.of<FilterProvider>(context, listen: false).selectedFilters;
 
       // Fetch nearby restaurants (For testing purposes use 5 we can change this num in the future)
-      final places = await fetchFoodByKeywordList(filters.isNotEmpty ? filters : ['food'], limit: 2);
+      final places = await fetchFoodByKeywordList(filters.isNotEmpty ? filters : ['food'], limit: 7);
       _restaurantList = places; // Save the fetched restaurants in _restaurantList
 
       // Create markers for each restaurant by looping through all restaurants
