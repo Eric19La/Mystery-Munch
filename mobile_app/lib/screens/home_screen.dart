@@ -114,12 +114,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 20),
 
                   // Filtered Sections — make sure data exists before showing
-                  for (String keyword in selectedFilters)
-                    if (filteredSections.containsKey(keyword))
-                      CategorySection(
-                        title: toTitleCase(keyword),
-                        items: filteredSections[keyword]!,
-                      ),
+                  isLoadingFilters
+                      ? const Center(child: CircularProgressIndicator())
+                      : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (String keyword in selectedFilters)
+                        if (filteredSections.containsKey(keyword))
+                          CategorySection(
+                            title: toTitleCase(keyword),
+                            items: filteredSections[keyword]!,
+                          ),
+                    ],
+                  ),
                 ],
               ),
             ),
