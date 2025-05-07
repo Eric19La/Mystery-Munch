@@ -166,8 +166,14 @@ class _BottomSheetListState extends State<BottomSheetList> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Your Mystery Restaurant!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-                    IconButton(icon: const Icon(Icons.close_outlined), onPressed: () => Navigator.of(context).pop(),),
+                    const Text(
+                      'Your Mystery Restaurant!',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+                    ),
+                    buildCompactCategoryIcon(
+                      icon: Icons.close_outlined,
+                      onTap: () => Navigator.pop(context)
+                    )
                   ],
                 ),
                 const SizedBox(height: 10),
