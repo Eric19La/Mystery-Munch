@@ -5,7 +5,7 @@ class BookmarksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Saved Restaurants")),
-      body: Center(child: Text("Your saved restaurants will show up here.")),
+      body: Center(child: Text("COMING SOON! Your saved restaurants will show up here.")),
     );
   }
 }
