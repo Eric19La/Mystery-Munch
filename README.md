@@ -8,6 +8,9 @@
 
 https://play.google.com/store/apps/details?id=com.eric.mysterymunch&utm_source=na_Med
 
+**Terms & Conditions:**
+https://eric19la.github.io/mysterymunch-privacy-policy/
+
 ---
 
 ## Demo
